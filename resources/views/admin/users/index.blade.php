@@ -9,7 +9,7 @@
 @endsection
 
 @section('content')
-<div class="bg-white rounded-2xl border border-zinc-200 shadow-sm overflow-hidden flex flex-col">
+<div class="bg-white rounded-2xl border border-zinc-200 shadow-sm flex flex-col">
   
   <!-- Role Tabs -->
   <div class="border-b border-zinc-100 px-6 pt-4 flex gap-6 overflow-x-auto no-scrollbar">
@@ -68,7 +68,7 @@
     </form>
   </div>
 
-  <div class="overflow-x-auto">
+  <div class="overflow-x-auto lg:overflow-visible">
     <table class="w-full text-left border-collapse">
       <thead>
         <tr class="bg-white text-xs font-bold text-gray-500 uppercase tracking-wider">
@@ -131,7 +131,15 @@
                   <button type="button" @click="open = !open" @click.away="open = false" class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-gray-50 text-gray-500 hover:bg-gray-200 transition-colors mr-1" title="Ubah Peran">
                      <i class="fa-solid fa-user-shield"></i>
                   </button>
-                  <div x-show="open" class="absolute right-0 mt-2 w-48 rounded-xl shadow-lg bg-white ring-1 ring-black ring-opacity-5 divide-y divide-gray-100 z-50 text-left" style="display: none;">
+                  <div x-show="open" 
+                       x-transition:enter="transition ease-out duration-100"
+                       x-transition:enter-start="opacity-0 scale-95"
+                       x-transition:enter-end="opacity-100 scale-100"
+                       x-transition:leave="transition ease-in duration-75"
+                       x-transition:leave-start="opacity-100 scale-100"
+                       x-transition:leave-end="opacity-0 scale-95"
+                       class="absolute right-0 mt-2 w-48 rounded-xl shadow-xl bg-white ring-1 ring-black ring-opacity-5 divide-y divide-gray-100 z-50 text-left" 
+                       style="display: none;">
                      <form action="{{ route('admin.users.update-role', $user->id) }}" method="POST">
                        @csrf
                        @method('PATCH')
@@ -154,7 +162,7 @@
 
               @if(auth()->id() !== $user->id)
                 @if(!$user->isAdmin() || (auth()->user()->isAdmin() && auth()->id() !== $user->id))
-                  <form action="{{ route('admin.users.destroy', $user->id) }}" method="POST" class="inline-block" onsubmit="return confirm('Apakah Anda yakin ingin menghapus akun pengguna ini? Semua data terkait (kecuali history order tertentu) akan hilang.');">
+                  <form action="{{ route('admin.users.destroy', $user->id) }}" method="POST" class="inline-block delete-form" data-confirm="Apakah Anda yakin ingin menghapus akun pengguna ini? Semua data terkait (kecuali history order tertentu) akan hilang.">
                     @csrf
                     @method('DELETE')
                     <button type="submit" class="w-8 h-8 rounded-lg bg-red-50 text-red-600 hover:bg-red-500 hover:text-white flex items-center justify-center transition-colors" title="Hapus Akun">
