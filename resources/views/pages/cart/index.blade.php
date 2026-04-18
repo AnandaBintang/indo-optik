@@ -29,7 +29,7 @@
     // Build subtotal
     $subtotal = 0;
     foreach ($cartItems as $item) {
-      $subtotal += ($item['price'] ?? 0) * ($item['quantity'] ?? 1);
+      $subtotal += ($item['product_price'] ?? 0) * ($item['quantity'] ?? 1);
       if (!empty($item['lens_price'])) {
         $subtotal += ($item['lens_price'] ?? 0) * ($item['quantity'] ?? 1);
       }
@@ -41,11 +41,11 @@
     $waLines = ['Halo IndoOptik! Saya ingin memesan:', ''];
     $itemNum = 1;
     foreach ($cartItems as $item) {
-      $linePrice = ($item['price'] ?? 0) + ($item['lens_price'] ?? 0);
-      $waLines[] = $itemNum . '. ' . ($item['name'] ?? 'Produk');
-      if (!empty($item['color']))     $waLines[] = '   Warna: ' . $item['color'];
-      if (!empty($item['lens_type'])) $waLines[] = '   Lensa: ' . $item['lens_type'];
-      if (!empty($item['delivery']))  $waLines[] = '   Pengiriman: ' . $item['delivery'];
+      $linePrice = ($item['product_price'] ?? 0) + ($item['lens_price'] ?? 0);
+      $waLines[] = $itemNum . '. ' . ($item['product_name'] ?? 'Produk');
+      if (!empty($item['color']))          $waLines[] = '   Warna: ' . $item['color'];
+      if (!empty($item['lens_type']))      $waLines[] = '   Lensa: ' . $item['lens_type'];
+      if (!empty($item['delivery_type']))  $waLines[] = '   Pengiriman: ' . ($item['delivery_type'] === 'delivery' ? 'Antar ke Rumah' : 'Ambil di Toko');
       $waLines[] = '   Harga: Rp ' . number_format($linePrice, 0, ',', '.');
       $waLines[] = '';
       $itemNum++;
@@ -66,7 +66,7 @@
       @if($hasItems)
         @foreach($cartItems as $key => $item)
           @php
-            $itemPrice    = ($item['price'] ?? 0) + ($item['lens_price'] ?? 0);
+            $itemPrice    = ($item['product_price'] ?? 0) + ($item['lens_price'] ?? 0);
             $itemQuantity = $item['quantity'] ?? 1;
             $itemTotal    = $itemPrice * $itemQuantity;
           @endphp
@@ -78,7 +78,7 @@
               @if(!empty($item['image']))
                 <img
                   src="{{ $item['image'] }}"
-                  alt="{{ $item['name'] ?? 'Produk' }}"
+                  alt="{{ $item['product_name'] ?? 'Produk' }}"
                   class="w-full h-full object-cover"
                   loading="lazy"
                 />
@@ -93,7 +93,7 @@
             <div class="flex-1 flex flex-col justify-between">
               <div class="flex justify-between items-start gap-4 mb-3">
                 <div>
-                  <h3 class="text-xl font-bold text-neutral-900 mb-1">{{ $item['name'] ?? 'Produk' }}</h3>
+                  <h3 class="text-xl font-bold text-neutral-900 mb-1">{{ $item['product_name'] ?? 'Produk' }}</h3>
                   <p class="text-2xl font-extrabold text-indigo-600">Rp {{ number_format($itemTotal, 0, ',', '.') }}</p>
                 </div>
 
@@ -130,11 +130,11 @@
                   </p>
                 @endif
 
-                @if(!empty($item['delivery']))
+                @if(!empty($item['delivery_type']))
                   <p class="flex flex-col">
                     <span class="text-gray-400 text-xs mb-0.5">Pengiriman</span>
                     <span class="text-neutral-900 font-semibold">
-                      @if($item['delivery'] === 'delivery')
+                      @if($item['delivery_type'] === 'delivery')
                         <i class="fa-solid fa-motorcycle text-indigo-400 mr-1 opacity-70"></i>Antar ke Rumah
                       @else
                         <i class="fa-solid fa-store text-indigo-400 mr-1 opacity-70"></i>Ambil di Toko
@@ -148,7 +148,7 @@
               <div class="flex items-center gap-4 mt-3 pt-3 border-t border-zinc-100">
                 <span class="text-xs text-gray-400 font-medium">Qty: {{ $itemQuantity }}</span>
 
-                @if(!empty($item['prescription']) && array_filter($item['prescription'] ?? []))
+                @if(!empty($item['prescription_data']) && array_filter((array) $item['prescription_data']))
                   <span class="inline-flex items-center gap-1 text-xs text-green-600 font-semibold bg-green-50 px-2 py-0.5 rounded-full">
                     <i class="fa-solid fa-circle-check text-[10px]"></i>
                     Resep disertakan
@@ -164,7 +164,7 @@
 
                 @if(!empty($item['lens_price']) && $item['lens_price'] > 0)
                   <span class="text-xs text-gray-400 font-medium ml-auto">
-                    Frame + Lensa: Rp {{ number_format($item['price'], 0, ',', '.') }} + Rp {{ number_format($item['lens_price'], 0, ',', '.') }}
+                    Frame + Lensa: Rp {{ number_format($item['product_price'], 0, ',', '.') }} + Rp {{ number_format($item['lens_price'], 0, ',', '.') }}
                   </span>
                 @endif
               </div>
@@ -237,11 +237,11 @@
           <div class="space-y-3 mb-6 text-sm">
             @foreach($cartItems as $item)
               @php
-                $linePrice = (($item['price'] ?? 0) + ($item['lens_price'] ?? 0)) * ($item['quantity'] ?? 1);
+                $linePrice = (($item['product_price'] ?? 0) + ($item['lens_price'] ?? 0)) * ($item['quantity'] ?? 1);
               @endphp
               <div class="flex justify-between gap-2">
                 <span class="text-gray-500 font-medium truncate max-w-[65%]">
-                  {{ $item['name'] ?? 'Produk' }}
+                  {{ $item['product_name'] ?? 'Produk' }}
                   @if(($item['quantity'] ?? 1) > 1)
                     <span class="text-gray-400">(×{{ $item['quantity'] }})</span>
                   @endif

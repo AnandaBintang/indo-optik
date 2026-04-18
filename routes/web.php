@@ -41,6 +41,9 @@ Route::patch("/keranjang/{key}", [CartController::class, "update"])->name(
 Route::delete("/keranjang/{key}", [CartController::class, "remove"])->name(
     "cart.remove",
 );
+Route::delete("/keranjang", [CartController::class, "clear"])->name(
+    "cart.clear",
+);
 Route::post("/keranjang/checkout", [CartController::class, "checkout"])->name(
     "cart.checkout",
 );

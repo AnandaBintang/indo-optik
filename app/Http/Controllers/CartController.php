@@ -70,9 +70,9 @@ class CartController extends Controller
 
         if ($request->wantsJson()) {
             return response()->json([
-                'success' => true,
-                'count'   => $this->cartService->getCount(),
-                'message' => 'Produk berhasil ditambahkan ke keranjang!',
+                'success'    => true,
+                'cart_count' => $this->cartService->getCount(),
+                'message'    => 'Produk berhasil ditambahkan ke keranjang!',
             ]);
         }
 
@@ -87,6 +87,16 @@ class CartController extends Controller
         $this->cartService->remove($key);
 
         return back()->with('success', 'Item dihapus dari keranjang.');
+    }
+
+    /**
+     * Clear the entire cart.
+     */
+    public function clear(): RedirectResponse
+    {
+        $this->cartService->clear();
+
+        return back()->with('success', 'Seluruh isi keranjang telah dikosongkan.');
     }
 
     /**

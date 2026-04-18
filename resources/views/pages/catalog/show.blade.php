@@ -634,13 +634,12 @@
             'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
           },
           body: JSON.stringify({
-            product_id:   productId,
-            product_slug: productSlug,
-            color:        selectedColor,
-            lens_type:    lensValue,
-            delivery:     deliveryValue,
-            prescription: rx,
-            promo_code:   promoCode
+            product_id:        productId,
+            color:             selectedColor,
+            lens_type:         lensValue,
+            delivery_type:     deliveryValue,
+            prescription_data: rx,
+            quantity:          1
           })
         })
         .then(function (r) { return r.json(); })
