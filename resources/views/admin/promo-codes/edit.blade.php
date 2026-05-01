@@ -50,13 +50,13 @@
                <option value="fixed">Nominal Tetap (Rp)</option>
              </select>
              @error('type') <p class="text-red-500 text-xs mt-1.5">{{ $message }}</p> @enderror
-             
+
              <!-- Nilai -->
              <div class="mt-5">
                <label for="value" class="block text-sm font-bold text-neutral-900 mb-2">Nilai Diskon <span class="text-red-500">*</span></label>
                <div class="relative">
                   <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 font-bold" x-text="type == 'fixed' ? 'Rp' : '%'"></span>
-                  <input type="number" id="value" name="value" value="{{ old('value', str_replace('.00', '', $promoCode->value)) }}" required step="0.01" min="0" 
+                  <input type="number" id="value" name="value" value="{{ old('value', number_format($promoCode->value, 2, '.', '')) }}" required step="0.01" min="0"
                     class="w-full bg-neutral-50 rounded-xl py-3 pl-11 pr-4 text-sm font-medium focus:ring-2 focus:ring-indigo-500 border border-zinc-200">
                </div>
                <p class="text-[10px] text-gray-500 mt-1.5" x-show="type == 'percentage'">Gunakan nilai antara 1 sampai 100.</p>
@@ -68,7 +68,7 @@
               <!-- Minimum Pembelian -->
               <div class="mb-5">
                 <label for="min_purchase" class="block text-sm font-bold text-neutral-900 mb-2">Batas Min. Belanja (Rp)</label>
-                <input type="number" id="min_purchase" name="min_purchase" value="{{ old('min_purchase', str_replace('.00', '', $promoCode->min_purchase)) }}" min="0" placeholder="0"
+                <input type="number" id="min_purchase" name="min_purchase" value="{{ old('min_purchase', number_format($promoCode->min_purchase, 2, '.', '')) }}" min="0" placeholder="0"
                   class="w-full bg-neutral-50 rounded-xl py-3 px-4 text-sm font-medium focus:ring-2 focus:ring-indigo-500 border border-zinc-200">
                 <p class="text-[10px] text-gray-500 mt-1.5">Kosongkan jika tidak ada batas minimal.</p>
                 @error('min_purchase') <p class="text-red-500 text-xs mt-1.5">{{ $message }}</p> @enderror
@@ -77,7 +77,7 @@
               <!-- Maksimum Diskon -->
               <div>
                 <label for="max_discount" class="block text-sm font-bold text-neutral-900 mb-2">Batas Maks. Diskon (Rp)</label>
-                <input type="number" id="max_discount" name="max_discount" value="{{ old('max_discount', str_replace('.00', '', $promoCode->max_discount)) }}" min="0" placeholder="0"
+                <input type="number" id="max_discount" name="max_discount" value="{{ old('max_discount', $promoCode->max_discount !== null ? number_format($promoCode->max_discount, 2, '.', '') : '') }}" min="0" placeholder="0"
                   class="w-full bg-neutral-50 rounded-xl py-3 px-4 text-sm font-medium focus:ring-2 focus:ring-indigo-500 border border-zinc-200">
                 <p class="text-[10px] text-gray-500 mt-1.5">Berguna untuk tipe Diskon Persentase agar jumlah diskon tidak terlalu besar.</p>
                 @error('max_discount') <p class="text-red-500 text-xs mt-1.5">{{ $message }}</p> @enderror
@@ -105,7 +105,7 @@
              @error('expired_at') <p class="text-red-500 text-xs mt-1.5">{{ $message }}</p> @enderror
            </div>
         </div>
-        
+
         <!-- Status -->
         <div class="mt-4 pt-4 border-t border-zinc-100">
           <label class="flex items-center gap-3 cursor-pointer p-4 rounded-xl border border-zinc-200 bg-neutral-50 w-full hover:border-indigo-500 transition max-w-sm">

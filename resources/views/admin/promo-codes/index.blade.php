@@ -11,7 +11,7 @@
 @section('content')
 <div class="bg-white rounded-2xl border border-zinc-200 shadow-sm overflow-hidden flex flex-col">
   <div class="px-6 py-5 border-b border-zinc-100 flex flex-col sm:flex-row gap-4 justify-between bg-neutral-50/50">
-    
+
     <!-- Filter & Search Form -->
     <form action="{{ route('admin.promo-codes.index') }}" method="GET" class="flex flex-col sm:flex-row flex-wrap gap-3 w-full">
       <!-- Search -->
@@ -19,11 +19,11 @@
         <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
           <i class="fa-solid fa-magnifying-glass text-gray-400 text-sm"></i>
         </div>
-        <input 
-          type="text" 
-          name="search" 
+        <input
+          type="text"
+          name="search"
           value="{{ request('search') }}"
-          placeholder="Cari kode promo..." 
+          placeholder="Cari kode promo..."
           class="w-full bg-white text-neutral-900 rounded-xl py-2.5 pl-9 pr-4 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500 border border-zinc-200 transition-all placeholder:text-gray-400 uppercase"
         >
       </div>
@@ -34,7 +34,7 @@
         <option value="percentage" {{ request('type') === 'percentage' ? 'selected' : '' }}>Persentase</option>
         <option value="fixed" {{ request('type') === 'fixed' ? 'selected' : '' }}>Nominal</option>
       </select>
-      
+
       <!-- Status -->
       <select name="is_active" class="bg-white text-neutral-900 rounded-xl py-2.5 px-4 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500 border border-zinc-200 transition-all sm:w-[140px]" onchange="this.form.submit()">
         <option value="">Semua Status</option>
@@ -84,13 +84,13 @@
                  </div>
                </div>
             </td>
-            
+
             <td class="px-6 py-4">
               <span class="font-extrabold text-indigo-600">
                  @if($promo->type === 'percentage')
-                   {{ rtrim(rtrim(number_format($promo->value, 2, ',', '.'), '0'), ',') }}%
+                   {{ number_format($promo->value, 2, '.', '') }}%
                  @else
-                   Rp {{ number_format($promo->value, 0, ',', '.') }}
+                   Rp {{ number_format($promo->value, 2, '.', '') }}
                  @endif
               </span>
               @if($promo->min_purchase > 0)
@@ -149,7 +149,7 @@
               <a href="{{ route('admin.promo-codes.edit', $promo->id) }}" class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-indigo-50 text-indigo-600 hover:bg-indigo-500 hover:text-white transition-colors" title="Edit">
                 <i class="fa-solid fa-pen-to-square"></i>
               </a>
-              
+
               <form action="{{ route('admin.promo-codes.destroy', $promo->id) }}" method="POST" class="inline-block ml-1 delete-form" data-confirm="Apakah Anda yakin ingin menghapus promo kode ini?">
                 @csrf
                 @method('DELETE')
@@ -173,7 +173,7 @@
       </tbody>
     </table>
   </div>
-  
+
   @if($promoCodes->hasPages())
     <div class="px-6 py-4 border-t border-zinc-100 bg-neutral-50/30">
       {{ $promoCodes->links() }}

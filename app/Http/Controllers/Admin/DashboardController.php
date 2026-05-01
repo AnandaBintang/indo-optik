@@ -19,7 +19,7 @@ class DashboardController extends Controller
         $totalProducts     = Product::count();
         $activeProducts    = Product::active()->count();
         $totalCategories   = Category::count();
-        $activePromos      = PromoCode::active()->count();
+        $activePromos      = PromoCode::where('is_active', true)->count();
         $totalTestimonials = Testimonial::count();
         $publishedReviews  = Testimonial::where('status', 'published')->count();
         $totalUsers        = User::where('role', User::ROLE_USER)->count();

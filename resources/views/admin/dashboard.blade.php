@@ -143,10 +143,10 @@
             <div class="px-6 py-4 flex items-center justify-between gap-4">
               <div class="min-w-0">
                 <p class="font-bold text-neutral-900 truncate">{{ $promo->label ?: $promo->code }}</p>
-                <p class="text-xs text-gray-500 mt-1 truncate">{{ $promo->code }} · {{ $promo->type === 'percentage' ? rtrim(rtrim(number_format($promo->value, 2), '0'), '.') . '%' : 'Rp ' . number_format($promo->value, 0, ',', '.') }}</p>
+                <p class="text-xs text-gray-500 mt-1 truncate">{{ $promo->code }} · {{ $promo->type === 'percentage' ? number_format($promo->value, 2, '.', '') . '%' : 'Rp ' . number_format($promo->value, 2, '.', '') }}</p>
               </div>
-              <span class="inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-bold {{ $promo->isValid() ? 'bg-emerald-50 text-emerald-700' : 'bg-gray-100 text-gray-600' }}">
-                {{ $promo->isValid() ? 'Aktif' : 'Nonaktif' }}
+              <span class="inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-bold {{ $promo->is_active ? 'bg-emerald-50 text-emerald-700' : 'bg-gray-100 text-gray-600' }}">
+                {{ $promo->is_active ? 'Aktif' : 'Nonaktif' }}
               </span>
             </div>
           @empty

@@ -124,6 +124,7 @@ class PromoCodeController extends Controller
         $validated["usage_limit"] = $validated["usage_limit"] ?? null;
         $validated["expired_at"] = $validated["expired_at"] ?? null;
 
+
         $promoCode->update($validated);
 
         return redirect()
@@ -174,4 +175,5 @@ class PromoCodeController extends Controller
                 "Kode promo \"{$promoCode->code}\" berhasil {$status}.",
             );
     }
+
 }

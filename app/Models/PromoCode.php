@@ -36,6 +36,56 @@ class PromoCode extends Model
     }
 
     // -------------------------------------------------------------------------
+    // Attribute mutators
+    // -------------------------------------------------------------------------
+
+    public function setValueAttribute($value): void
+    {
+        $this->attributes['value'] = $this->normalizeDecimalInput($value);
+    }
+
+    public function setMaxDiscountAttribute($value): void
+    {
+        $this->attributes['max_discount'] = $this->normalizeDecimalInput(
+            $value,
+            true,
+        );
+    }
+
+    public function setMinPurchaseAttribute($value): void
+    {
+        $this->attributes['min_purchase'] =
+            $this->normalizeDecimalInput($value) ?? '0.00';
+    }
+
+    private function normalizeDecimalInput($value, bool $nullable = false): ?string
+    {
+        if ($value === null || $value === '') {
+            return $nullable ? null : '0.00';
+        }
+
+        $normalized = str_replace(' ', '', (string) $value);
+        $normalized = str_replace(',', '.', $normalized);
+
+        $lastDot = strrpos($normalized, '.');
+        if ($lastDot !== false) {
+            $normalized = str_replace('.', '', substr($normalized, 0, $lastDot))
+                . substr($normalized, $lastDot);
+        }
+
+        $parts = explode('.', $normalized, 2);
+        $integer = ltrim($parts[0], '0');
+        if ($integer === '') {
+            $integer = '0';
+        }
+
+        $decimal = $parts[1] ?? '';
+        $decimal = substr($decimal . '00', 0, 2);
+
+        return $integer . '.' . $decimal;
+    }
+
+    // -------------------------------------------------------------------------
     // Relationships
     // -------------------------------------------------------------------------
 
