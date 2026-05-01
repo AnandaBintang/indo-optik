@@ -72,7 +72,7 @@
           <div class="border border-zinc-200 rounded-[20px] p-4 bg-white shadow-sm">
             <div class="flex justify-between items-center mb-4">
               <button type="button" class="text-gray-400 hover:text-indigo-600 transition"><i class="fa-solid fa-chevron-left"></i></button>
-              <span class="font-bold text-neutral-900">{{ current_date()->translatedFormat('F Y') }}</span>
+              <span class="font-bold text-neutral-900">{{ now()->translatedFormat('F Y') }}</span>
               <button type="button" class="text-gray-400 hover:text-indigo-600 transition"><i class="fa-solid fa-chevron-right"></i></button>
             </div>
             <div class="grid grid-cols-7 gap-1 text-center text-xs font-semibold text-gray-400 mb-2">
@@ -100,7 +100,7 @@
               <div data-cal-day class="h-9 w-9 mx-auto flex items-center justify-center rounded-full text-sm cursor-pointer transition-all duration-150 hover:bg-indigo-50 hover:text-indigo-600 text-neutral-700">16</div>
 
               <!-- Selected -->
-              <div data-cal-day class="h-9 w-9 mx-auto flex items-center justify-center rounded-full text-sm cursor-pointer transition-all duration-150 bg-indigo-500 text-white font-bold shadow-md shadow-indigo-200">17</div>
+              <div data-cal-day class="selected h-9 w-9 mx-auto flex items-center justify-center rounded-full text-sm cursor-pointer transition-all duration-150 bg-indigo-500 text-white font-bold shadow-md shadow-indigo-200">17</div>
 
               <div data-cal-day class="h-9 w-9 mx-auto flex items-center justify-center rounded-full text-sm cursor-pointer transition-all duration-150 hover:bg-indigo-50 hover:text-indigo-600 text-neutral-700">18</div>
               <div data-cal-day class="h-9 w-9 mx-auto flex items-center justify-center rounded-full text-sm cursor-pointer transition-all duration-150 hover:bg-indigo-50 hover:text-indigo-600 text-neutral-700">19</div>
@@ -119,7 +119,7 @@
             <button type="button" data-time-btn class="py-3.5 rounded-2xl border-2 border-zinc-200 text-gray-500 font-medium hover:border-indigo-500 hover:text-indigo-600 transition-all duration-200">11:00</button>
             <button type="button" data-time-btn class="py-3.5 rounded-2xl border-2 border-zinc-200 text-gray-500 font-medium hover:border-indigo-500 hover:text-indigo-600 transition-all duration-200">13:00</button>
 
-            <button type="button" data-time-btn class="py-3.5 rounded-2xl border-2 border-indigo-500 bg-indigo-50 text-indigo-600 font-bold transition-all duration-200">14:00</button>
+            <button type="button" data-time-btn class="selected py-3.5 rounded-2xl border-2 border-indigo-500 bg-indigo-50 text-indigo-600 font-bold transition-all duration-200">14:00</button>
 
             <button type="button" data-time-btn class="py-3.5 rounded-2xl border-2 border-zinc-200 text-gray-500 font-medium hover:border-indigo-500 hover:text-indigo-600 transition-all duration-200">15:00</button>
             <button type="button" data-time-btn class="py-3.5 rounded-2xl border-2 border-zinc-200 text-gray-500 font-medium hover:border-indigo-500 hover:text-indigo-600 transition-all duration-200">16:00</button>

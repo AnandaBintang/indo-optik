@@ -79,18 +79,6 @@
           Kode Promo
         </a>
 
-        <!-- Pesanan Section -->
-        <div class="pt-4 pb-1">
-          <p class="px-3 text-[10px] font-bold text-slate-500 uppercase tracking-widest">Pesanan</p>
-        </div>
-
-        <a href="{{ route('admin.orders.index') }}"
-          class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-all duration-150
-                {{ request()->routeIs('admin.orders.*') ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-500/20' : 'text-slate-400 hover:text-white hover:bg-white/10' }}">
-          <i class="fa-solid fa-bag-shopping w-4 text-center"></i>
-          Pesanan
-        </a>
-
         <!-- Pengaturan Section -->
         <div class="pt-4 pb-1">
           <p class="px-3 text-[10px] font-bold text-slate-500 uppercase tracking-widest">Sistem</p>
@@ -114,7 +102,7 @@
 
       <!-- Sidebar Footer -->
       <div class="px-4 py-4 border-t border-white/10">
-        <a href="{{ route('home') }}" target="_blank"
+        <a href="{{ route('home') }}" target="_blank" rel="noopener noreferrer"
           class="flex items-center gap-2 px-3 py-2 rounded-xl text-sm text-slate-400 hover:text-white hover:bg-white/10 transition-all duration-150 font-medium">
           <i class="fa-solid fa-arrow-up-right-from-square w-4 text-center text-xs"></i>
           Lihat Toko
@@ -202,7 +190,7 @@
                   Pengaturan
                 </a>
 
-                <a href="{{ route('home') }}" target="_blank"
+                <a href="{{ route('home') }}" target="_blank" rel="noopener noreferrer"
                   class="flex items-center gap-3 px-4 py-2 text-sm text-gray-600 hover:text-indigo-600 hover:bg-indigo-50 transition-colors font-medium">
                   <i class="fa-solid fa-store w-4 text-center text-gray-400"></i>
                   Lihat Toko
@@ -284,93 +272,10 @@
 
   <!-- Mobile Sidebar Overlay -->
   <div id="sidebar-overlay" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-30 lg:hidden hidden"
-    onclick="document.querySelector('.admin-sidebar').classList.add('-translate-x-full'); this.classList.add('hidden');">
+    aria-hidden="true">
   </div>
 
   @stack('scripts')
-
-  <script>
-    // Simple Alpine.js fallback for dropdown if Alpine is not loaded
-    document.addEventListener('DOMContentLoaded', function () {
-      // Sidebar mobile toggle
-      const sidebarToggle = document.getElementById('sidebar-toggle');
-      const sidebar = document.querySelector('.admin-sidebar');
-      const overlay = document.getElementById('sidebar-overlay');
-
-      if (sidebarToggle && sidebar && overlay) {
-        sidebarToggle.addEventListener('click', function () {
-          sidebar.classList.toggle('-translate-x-full');
-          overlay.classList.toggle('hidden');
-        });
-      }
-
-      // User dropdown fallback (if Alpine is not available)
-      if (typeof window.Alpine === 'undefined') {
-        const dropdownBtns = document.querySelectorAll('[\\@click]');
-        // Basic dropdown toggle
-        const userBtn = document.querySelector('[aria-haspopup="true"]');
-        const dropdownMenu = userBtn ? userBtn.nextElementSibling : null;
-        if (userBtn && dropdownMenu) {
-          userBtn.addEventListener('click', function (e) {
-            e.stopPropagation();
-            const isHidden = dropdownMenu.style.display === 'none' || dropdownMenu.style.display === '';
-            dropdownMenu.style.display = isHidden ? 'block' : 'none';
-          });
-          document.addEventListener('click', function () {
-            if (dropdownMenu) dropdownMenu.style.display = 'none';
-          });
-        }
-      }
-    });
-  </script>
-  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-  <script>
-    @if(session('success'))
-      Swal.fire({
-        toast: true,
-        position: 'top-end',
-        icon: 'success',
-        title: "{{ session('success') }}",
-        showConfirmButton: false,
-        timer: 3000,
-        timerProgressBar: true
-      });
-    @endif
-
-    @if(session('error'))
-      Swal.fire({
-        toast: true,
-        position: 'top-end',
-        icon: 'error',
-        title: "{{ session('error') }}",
-        showConfirmButton: false,
-        timer: 4000,
-        timerProgressBar: true
-      });
-    @endif
-
-    // Handle delete-form confirmation
-    document.querySelectorAll('.delete-form').forEach(form => {
-      form.addEventListener('submit', function (e) {
-        e.preventDefault();
-        const msg = this.dataset.confirm || "Apakah Anda yakin?";
-        Swal.fire({
-          title: msg,
-          text: "Aksi ini tidak dapat dibatalkan!",
-          icon: 'warning',
-          showCancelButton: true,
-          confirmButtonColor: '#ef4444',
-          cancelButtonColor: '#94a3b8',
-          confirmButtonText: 'Ya, eksekusi!',
-          cancelButtonText: 'Batal'
-        }).then((result) => {
-          if (result.isConfirmed) {
-            this.submit();
-          }
-        })
-      });
-    });
-  </script>
 
 </body>
 

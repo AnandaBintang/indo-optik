@@ -12,7 +12,10 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->web(
-            append: [\App\Http\Middleware\ShareSettingsToViews::class],
+            append: [
+                \App\Http\Middleware\SecurityHeaders::class,
+                \App\Http\Middleware\ShareSettingsToViews::class,
+            ],
         );
 
         $middleware->alias([

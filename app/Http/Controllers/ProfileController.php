@@ -34,7 +34,9 @@ class ProfileController extends Controller
 
         $request->user()->save();
 
-        return Redirect::route('profile.edit')->with('status', 'profile-updated');
+        $redirectTo = $request->is('profile') ? '/profile' : route('profile.edit');
+
+        return Redirect::to($redirectTo)->with('status', 'profile-updated');
     }
 
     /**

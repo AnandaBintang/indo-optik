@@ -136,7 +136,7 @@
                   </button>
                 </form>
               @else
-                <a href="{{ route('products.show', $product->slug ?? 'slug') }}" target="_blank" class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-gray-50 text-gray-600 hover:bg-gray-200 transition-colors mr-1" title="Lihat di Web" style="pointer-events: none; opacity:0.5;">
+                <a href="{{ route('products.show', $product->slug ?? 'slug') }}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-gray-50 text-gray-600 hover:bg-gray-200 transition-colors mr-1" title="Lihat di Web" style="pointer-events: none; opacity:0.5;">
                   <!-- We redirect front end show properly using proper route later, but for now we put a placeholder link -->
                   <i class="fa-solid fa-arrow-up-right-from-square text-xs"></i>
                 </a>

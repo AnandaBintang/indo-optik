@@ -33,7 +33,6 @@ class UserController extends Controller
                 $role !== null && $role !== "",
                 fn($q) => $q->where("role", $role),
             )
-            ->withCount("orders")
             ->latest()
             ->paginate(20)
             ->withQueryString();
@@ -58,9 +57,6 @@ class UserController extends Controller
      */
     public function show(User $user): View
     {
-        $user->loadCount("orders");
-        $user->load(["orders" => fn($q) => $q->latest()->take(10)]);
-
         return view("admin.users.show", compact("user"));
     }
 

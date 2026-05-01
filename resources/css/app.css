@@ -1,3 +1,6 @@
+/* --- Google Fonts --- */
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap");
+
 @import "tailwindcss";
 @plugin "@tailwindcss/forms";
 
@@ -9,9 +12,6 @@
 /* =========================================
    IndoOptik — Global Design System v2
    ========================================= */
-
-/* --- Google Fonts --- */
-@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap");
 
 /* --- Design Tokens --- */
 :root {
@@ -132,9 +132,13 @@ a {
 .hide-scrollbar::-webkit-scrollbar {
     display: none;
 }
-.hide-scrollbar {
+.hide-scrollbar,
+.no-scrollbar {
     -ms-overflow-style: none;
     scrollbar-width: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+    display: none;
 }
 
 /* =========================================
@@ -749,7 +753,7 @@ a {
 /* =========================================
    SCROLL ANIMATIONS
    ========================================= */
-[data-animate] {
+[data-animate].will-animate {
     opacity: 0;
     transform: translateY(24px);
     transition:
@@ -777,7 +781,7 @@ a {
     transition-delay: 0.4s;
 }
 
-[data-animate="slide-left"] {
+[data-animate="slide-left"].will-animate {
     opacity: 0;
     transform: translateX(-24px);
     transition:
@@ -789,7 +793,7 @@ a {
     transform: translateX(0);
 }
 
-[data-animate="slide-right"] {
+[data-animate="slide-right"].will-animate {
     opacity: 0;
     transform: translateX(24px);
     transition:
@@ -801,7 +805,7 @@ a {
     transform: translateX(0);
 }
 
-[data-animate="scale-up"] {
+[data-animate="scale-up"].will-animate {
     opacity: 0;
     transform: scale(0.94);
     transition:
@@ -1341,6 +1345,69 @@ body {
     flex: 1;
     padding: 32px;
     overflow-x: hidden;
+}
+
+@media (max-width: 767px) {
+    .admin-content {
+        padding: 16px;
+    }
+
+    .admin-content .overflow-x-auto {
+        overflow-x: visible;
+    }
+
+    .admin-content table {
+        min-width: 0 !important;
+    }
+
+    .admin-content table,
+    .admin-content thead,
+    .admin-content tbody,
+    .admin-content tr,
+    .admin-content td {
+        display: block;
+        width: 100%;
+    }
+
+    .admin-content thead {
+        display: none;
+    }
+
+    .admin-content tbody {
+        padding: 12px;
+    }
+
+    .admin-content tr {
+        border: 1px solid var(--color-border);
+        border-radius: 18px;
+        background: #fff;
+        overflow: hidden;
+        margin-bottom: 12px;
+        box-shadow: var(--shadow-sm);
+    }
+
+    .admin-content tr:hover td {
+        background: transparent;
+    }
+
+    .admin-content td {
+        border: 0 !important;
+        padding: 10px 14px !important;
+        text-align: left !important;
+    }
+
+    .admin-content td:first-child {
+        padding-top: 14px !important;
+    }
+
+    .admin-content td:last-child {
+        padding-bottom: 14px !important;
+    }
+
+    .admin-content td.text-right,
+    .admin-content td.text-center {
+        text-align: left !important;
+    }
 }
 
 .stat-card {

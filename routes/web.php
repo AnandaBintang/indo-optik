@@ -76,12 +76,15 @@ Route::middleware("auth")->group(function () {
     Route::get("/profil", [ProfileController::class, "edit"])->name(
         "profile.edit",
     );
+    Route::get("/profile", [ProfileController::class, "edit"]);
     Route::patch("/profil", [ProfileController::class, "update"])->name(
         "profile.update",
     );
+    Route::patch("/profile", [ProfileController::class, "update"]);
     Route::delete("/profil", [ProfileController::class, "destroy"])->name(
         "profile.destroy",
     );
+    Route::delete("/profile", [ProfileController::class, "destroy"]);
 });
 
 // -------------------------------------------------------------------------
@@ -150,16 +153,4 @@ Route::prefix("admin")
             "destroy",
         ])->name("users.destroy");
 
-        // ---- Orders ----
-        Route::get("orders", [Admin\OrderController::class, "index"])->name(
-            "orders.index",
-        );
-        Route::get("orders/{order}", [
-            Admin\OrderController::class,
-            "show",
-        ])->name("orders.show");
-        Route::patch("orders/{order}/status", [
-            Admin\OrderController::class,
-            "updateStatus",
-        ])->name("orders.update-status");
     });

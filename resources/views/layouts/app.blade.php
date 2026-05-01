@@ -19,31 +19,16 @@
   @include('partials.footer')
   @stack('scripts')
   
-  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <script>
-    @if(session('success'))
-    Swal.fire({
-      toast: true,
-      position: 'top-end',
-      icon: 'success',
-      title: "{{ session('success') }}",
-      showConfirmButton: false,
-      timer: 3000,
-      timerProgressBar: true
-    });
-    @endif
+    document.addEventListener('DOMContentLoaded', function () {
+      @if(session('success'))
+        window.showToast && window.showToast('success', @json(session('success')), '', 3000);
+      @endif
 
-    @if(session('error'))
-    Swal.fire({
-      toast: true,
-      position: 'top-end',
-      icon: 'error',
-      title: "{{ session('error') }}",
-      showConfirmButton: false,
-      timer: 4000,
-      timerProgressBar: true
+      @if(session('error'))
+        window.showToast && window.showToast('error', @json(session('error')), '', 4000);
+      @endif
     });
-    @endif
   </script>
 </body>
 </html>

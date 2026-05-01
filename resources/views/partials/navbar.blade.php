@@ -120,7 +120,8 @@
       </div>
 
       {{-- Hamburger (Mobile) --}}
-      <button class="hamburger-btn"
+      <button type="button"
+              class="hamburger-btn"
               id="hamburger-btn"
               aria-label="Buka menu navigasi"
               aria-expanded="false"
@@ -140,7 +141,7 @@
     {{-- Drawer Header --}}
     <div class="mobile-drawer-header">
       <a href="{{ route('home') }}" class="navbar-logo" style="font-size:1.25rem;">IndoOptik</a>
-      <button class="mobile-drawer-close" id="drawer-close" aria-label="Tutup menu">
+      <button type="button" class="mobile-drawer-close" id="drawer-close" aria-label="Tutup menu">
         <i class="fa-solid fa-xmark"></i>
       </button>
     </div>
@@ -218,112 +219,3 @@
 
   </div>
 </nav>
-
-{{-- Navbar JS --}}
-<script>
-(function () {
-  'use strict';
-
-  document.addEventListener('DOMContentLoaded', function () {
-
-    const hamburgerBtn  = document.getElementById('hamburger-btn');
-    const hamburgerIcon = document.getElementById('hamburger-icon');
-    const mobileDrawer  = document.getElementById('mobile-drawer');
-    const drawerClose   = document.getElementById('drawer-close');
-    const drawerOverlay = document.getElementById('drawer-overlay');
-    const navbarContainer = document.getElementById('main-navbar');
-    const DRAWER_CLOSE_MS = 240;
-    let unlockTimer = null;
-
-    function lockBodyScroll() {
-      if (unlockTimer) { clearTimeout(unlockTimer); unlockTimer = null; }
-      const scrollCompensation = Math.max(window.innerWidth - document.documentElement.clientWidth, 0);
-      document.body.style.setProperty('--scrollbar-compensation', scrollCompensation + 'px');
-      document.body.classList.add('drawer-open');
-    }
-
-    function unlockBodyScroll() {
-      document.body.classList.remove('drawer-open');
-      document.body.style.removeProperty('--scrollbar-compensation');
-    }
-
-    function openDrawer() {
-      if (!mobileDrawer) return;
-      mobileDrawer.classList.add('open');
-      if (hamburgerBtn) hamburgerBtn.setAttribute('aria-expanded', 'true');
-      if (hamburgerIcon) hamburgerIcon.className = 'fa-solid fa-xmark';
-      lockBodyScroll();
-    }
-
-    function closeDrawer() {
-      if (!mobileDrawer) return;
-      mobileDrawer.classList.remove('open');
-      if (hamburgerBtn) hamburgerBtn.setAttribute('aria-expanded', 'false');
-      if (hamburgerIcon) hamburgerIcon.className = 'fa-solid fa-bars';
-      if (unlockTimer) clearTimeout(unlockTimer);
-      unlockTimer = window.setTimeout(function () {
-        unlockBodyScroll();
-        unlockTimer = null;
-      }, DRAWER_CLOSE_MS);
-    }
-
-    function toggleDrawer() {
-      if (mobileDrawer && mobileDrawer.classList.contains('open')) {
-        closeDrawer();
-      } else {
-        openDrawer();
-      }
-    }
-
-    if (hamburgerBtn)  hamburgerBtn.addEventListener('click', toggleDrawer);
-    if (drawerClose)   drawerClose.addEventListener('click', closeDrawer);
-    if (drawerOverlay) drawerOverlay.addEventListener('click', closeDrawer);
-
-    document.addEventListener('keydown', function (e) {
-      if (e.key === 'Escape') closeDrawer();
-    });
-
-    window.addEventListener('resize', function () {
-      if (window.innerWidth >= 1024) closeDrawer();
-    });
-
-    if (mobileDrawer) {
-      mobileDrawer.querySelectorAll('.mobile-drawer-nav a, .mobile-drawer-footer a, .mobile-drawer-footer button').forEach(function (el) {
-        el.addEventListener('click', closeDrawer);
-      });
-    }
-
-    // Scroll shadow
-    if (navbarContainer) {
-      window.addEventListener('scroll', function () {
-        navbarContainer.classList.toggle('scrolled', window.scrollY > 8);
-      }, { passive: true });
-    }
-
-    // User dropdown toggle
-    const userDropdownBtn  = document.getElementById('user-dropdown-btn');
-    const userDropdownMenu = document.getElementById('user-dropdown-menu');
-
-    if (userDropdownBtn && userDropdownMenu) {
-      userDropdownBtn.addEventListener('click', function (e) {
-        e.stopPropagation();
-        const isOpen = userDropdownMenu.style.display === 'block';
-        userDropdownMenu.style.display = isOpen ? 'none' : 'block';
-        userDropdownBtn.setAttribute('aria-expanded', String(!isOpen));
-      });
-
-      document.addEventListener('click', function () {
-        if (userDropdownMenu) {
-          userDropdownMenu.style.display = 'none';
-          if (userDropdownBtn) userDropdownBtn.setAttribute('aria-expanded', 'false');
-        }
-      });
-
-      userDropdownMenu.addEventListener('click', function (e) {
-        e.stopPropagation();
-      });
-    }
-
-  });
-})();
-</script>

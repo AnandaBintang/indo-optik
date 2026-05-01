@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', $settings['site_name'] ?? 'IndoOptik' . ' — Kacamata & Lensa Berkualitas Terbaik')
+@section('title', ($settings['site_name'] ?? 'IndoOptik') . ' — Kacamata & Lensa Berkualitas Terbaik')
 @section('description', 'IndoOptik menyediakan kacamata dan lensa berkualitas tinggi dengan harga terjangkau. Temukan frame modern, periksa mata, dan buat janji temu secara online.')
 @section('og_title', 'IndoOptik — Kacamata & Lensa Berkualitas Terbaik')
 @section('og_description', 'Solusi optik modern yang praktis, terjangkau, dan stylish di Indonesia.')
@@ -10,51 +10,64 @@
 {{-- ============================================================
      HERO
      ============================================================ --}}
-<section class="relative flex items-center bg-neutral-900 min-h-[100dvh]">
-  <img
-    src="https://images.unsplash.com/photo-1511499767150-a48a237f0083?auto=format&fit=crop&q=80&w=1600"
-    alt="Kacamata modern IndoOptik"
-    class="absolute inset-0 w-full h-full object-cover opacity-50"
-  />
-  <div class="absolute inset-0 bg-gradient-to-r from-neutral-900/92 via-neutral-900/60 to-transparent"></div>
+<section class="relative overflow-hidden bg-[#11131a] text-white">
+  <div class="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(129,140,248,0.35),transparent_34%),linear-gradient(135deg,#11131a_0%,#1f2433_48%,#f3f4f6_100%)]"></div>
+  <div class="absolute -right-24 top-24 h-64 w-64 rounded-full bg-indigo-400/20 blur-3xl"></div>
 
-  <div class="relative page-shell w-full py-20">
-    <div class="max-w-2xl" data-animate>
-      <span class="inline-flex items-center gap-2 px-4 py-1.5 bg-indigo-500/20 text-indigo-300 rounded-full text-sm font-semibold tracking-wider uppercase mb-6">
+  <div class="relative page-shell grid min-h-[640px] items-center gap-10 py-12 sm:py-16 lg:grid-cols-[1.02fr_0.98fr] lg:py-20">
+    <div class="max-w-3xl" data-animate>
+      <span class="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/10 px-4 py-2 text-xs font-bold uppercase tracking-[0.18em] text-indigo-100 backdrop-blur">
         <i class="fa-solid fa-sparkles"></i> Selamat Datang di IndoOptik
       </span>
-      <h1 class="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold text-white leading-tight mb-6 tracking-tight">
-        Penglihatan Jernih,<br />
-        <span class="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-violet-400">Gaya Terbaik</span> Anda
+
+      <h1 class="mt-6 text-[clamp(2.65rem,7vw,5.35rem)] font-black leading-[0.98] tracking-[-0.055em]">
+        Penglihatan jernih,<br>
+        <span class="bg-gradient-to-r from-indigo-300 via-violet-300 to-white bg-clip-text text-transparent">gaya terbaik</span> Anda.
       </h1>
-      <p class="text-xl md:text-2xl text-white/80 mb-10 font-light leading-relaxed">
-        Solusi optik modern yang praktis, terjangkau, dan stylish untuk semua kalangan.
+
+      <p class="mt-6 max-w-2xl text-base leading-8 text-white/78 sm:text-lg lg:text-xl">
+        Katalog frame, konsultasi lensa, dan janji periksa mata dibuat praktis. Pilih produk, lalu konfirmasi langsung lewat WhatsApp.
       </p>
-      <div class="flex flex-wrap gap-4">
-        <a href="{{ route('services.index') }}" class="btn btn-primary btn-xl" id="hero-booking-btn">
+
+      <div class="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
+        <a href="{{ route('services.index') }}" class="btn btn-primary btn-xl w-full sm:w-auto" id="hero-booking-btn">
           <i class="fa-solid fa-calendar-check text-base"></i>
           Buat Janji Temu
         </a>
-        <a href="{{ route('catalog.index') }}" class="btn btn-xl bg-white/10 text-white font-semibold border border-white/30 backdrop-blur-md hover:bg-white/20" id="hero-catalog-btn">
+        <a href="{{ route('catalog.index') }}" class="btn btn-xl w-full border border-white/80 bg-white text-neutral-950 shadow-lg shadow-neutral-950/20 hover:bg-indigo-50 hover:text-indigo-700 sm:w-auto" id="hero-catalog-btn">
           <i class="fa-solid fa-magnifying-glass text-base"></i>
           Lihat Katalog
         </a>
       </div>
+
+      <div class="mt-8 grid grid-cols-3 gap-2 sm:max-w-xl sm:gap-3" data-animate data-animate-delay="2">
+        <div class="rounded-2xl border border-white/10 bg-white/10 p-3 backdrop-blur sm:p-4">
+          <p class="text-2xl font-black sm:text-3xl" data-count="5000">0</p>
+          <p class="mt-1 text-[11px] font-medium text-white/62 sm:text-xs">Pelanggan Puas</p>
+        </div>
+        <div class="rounded-2xl border border-white/10 bg-white/10 p-3 backdrop-blur sm:p-4">
+          <p class="text-2xl font-black sm:text-3xl" data-count="200">0</p>
+          <p class="mt-1 text-[11px] font-medium text-white/62 sm:text-xs">Pilihan Frame</p>
+        </div>
+        <div class="rounded-2xl border border-white/10 bg-white/10 p-3 backdrop-blur sm:p-4">
+          <p class="text-2xl font-black sm:text-3xl">8+</p>
+          <p class="mt-1 text-[11px] font-medium text-white/62 sm:text-xs">Tahun Pengalaman</p>
+        </div>
+      </div>
     </div>
 
-    {{-- Stats floating card --}}
-    <div class="absolute bottom-10 right-6 hidden lg:flex gap-6" data-animate data-animate-delay="3">
-      <div class="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl px-6 py-4 text-center">
-        <p class="text-3xl font-bold text-white" data-count="5000">0</p>
-        <p class="text-white/70 text-sm mt-1">Pelanggan Puas</p>
-      </div>
-      <div class="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl px-6 py-4 text-center">
-        <p class="text-3xl font-bold text-white" data-count="200">0</p>
-        <p class="text-white/70 text-sm mt-1">Pilihan Frame</p>
-      </div>
-      <div class="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl px-6 py-4 text-center">
-        <p class="text-3xl font-bold text-white">8+</p>
-        <p class="text-white/70 text-sm mt-1">Tahun Pengalaman</p>
+    <div class="relative hidden lg:block" data-animate="slide-right">
+      <div class="absolute -left-8 top-10 h-24 w-24 rounded-full bg-indigo-400/25 blur-2xl"></div>
+      <div class="relative overflow-hidden rounded-[44px] border border-white/15 bg-white/10 p-4 shadow-2xl shadow-neutral-950/30 backdrop-blur">
+        <img
+          src="https://images.unsplash.com/photo-1511499767150-a48a237f0083?auto=format&fit=crop&q=80&w=1200"
+          alt="Kacamata modern IndoOptik"
+          class="h-[470px] w-full rounded-[32px] object-cover"
+        />
+        <div class="absolute bottom-8 left-8 right-8 rounded-3xl border border-white/20 bg-neutral-950/70 p-5 backdrop-blur-md">
+          <p class="text-sm font-bold text-indigo-200">Konsultasi cepat</p>
+          <p class="mt-1 text-2xl font-black">Pilih frame hari ini, konfirmasi via WhatsApp.</p>
+        </div>
       </div>
     </div>
   </div>

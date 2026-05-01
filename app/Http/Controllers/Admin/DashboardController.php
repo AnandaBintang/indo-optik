@@ -3,7 +3,8 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\Order;
+use App\Models\Category;
+use App\Models\PromoCode;
 use App\Models\Product;
 use App\Models\Testimonial;
 use App\Models\User;
@@ -11,39 +12,37 @@ use App\Models\User;
 class DashboardController extends Controller
 {
     /**
-     * Display the admin dashboard with summary statistics and recent orders.
+     * Display catalog and content statistics for the WhatsApp-only storefront.
      */
     public function index()
     {
         $totalProducts     = Product::count();
-        $totalOrders       = Order::count();
+        $activeProducts    = Product::active()->count();
+        $totalCategories   = Category::count();
+        $activePromos      = PromoCode::active()->count();
         $totalTestimonials = Testimonial::count();
+        $publishedReviews  = Testimonial::where('status', 'published')->count();
         $totalUsers        = User::where('role', User::ROLE_USER)->count();
 
-        $recentOrders = Order::with(['items', 'user'])
+        $latestProducts = Product::with('category')
             ->latest()
-            ->take(10)
+            ->take(6)
             ->get();
 
-        // Revenue stats
-        $totalRevenue = Order::where('status', Order::STATUS_COMPLETED)->sum('total');
-
-        $pendingOrders    = Order::where('status', Order::STATUS_PENDING)->count();
-        $processingOrders = Order::where('status', Order::STATUS_PROCESSING)->count();
-        $completedOrders  = Order::where('status', Order::STATUS_COMPLETED)->count();
-        $cancelledOrders  = Order::where('status', Order::STATUS_CANCELLED)->count();
+        $latestPromos = PromoCode::latest()
+            ->take(5)
+            ->get();
 
         return view('admin.dashboard', compact(
             'totalProducts',
-            'totalOrders',
+            'activeProducts',
+            'totalCategories',
+            'activePromos',
             'totalTestimonials',
+            'publishedReviews',
             'totalUsers',
-            'recentOrders',
-            'totalRevenue',
-            'pendingOrders',
-            'processingOrders',
-            'completedOrders',
-            'cancelledOrders',
+            'latestProducts',
+            'latestPromos',
         ));
     }
 }

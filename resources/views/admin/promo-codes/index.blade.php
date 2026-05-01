@@ -150,7 +150,7 @@
                 <i class="fa-solid fa-pen-to-square"></i>
               </a>
               
-              <form action="{{ route('admin.promo-codes.destroy', $promo->id) }}" method="POST" class="inline-block ml-1" onsubmit="return confirm('Apakah Anda yakin ingin menghapus promo kode ini?');">
+              <form action="{{ route('admin.promo-codes.destroy', $promo->id) }}" method="POST" class="inline-block ml-1 delete-form" data-confirm="Apakah Anda yakin ingin menghapus promo kode ini?">
                 @csrf
                 @method('DELETE')
                 <button type="submit" class="w-8 h-8 rounded-lg bg-red-50 text-red-600 hover:bg-red-500 hover:text-white flex items-center justify-center transition-colors" title="Hapus">

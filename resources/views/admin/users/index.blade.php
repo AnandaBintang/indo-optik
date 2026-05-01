@@ -75,7 +75,6 @@
           <th class="px-6 py-4 border-b border-zinc-100">Pengguna</th>
           <th class="px-6 py-4 border-b border-zinc-100">Role</th>
           <th class="px-6 py-4 border-b border-zinc-100">Bergabung</th>
-          <th class="px-6 py-4 border-b border-zinc-100 text-center">Total Pesanan</th>
           <th class="px-6 py-4 border-b border-zinc-100 text-right">Aksi</th>
         </tr>
       </thead>
@@ -118,12 +117,6 @@
               <p class="text-[10px] text-gray-400 mt-0.5">{{ $user->created_at->diffForHumans() }}</p>
             </td>
 
-            <td class="px-6 py-4 text-center">
-              <a href="{{ route('admin.orders.index', ['search' => $user->email]) }}" class="inline-flex items-center justify-center bg-indigo-50 hover:bg-indigo-100 text-indigo-700 w-8 h-8 rounded-full font-bold text-xs transition">
-                {{ $user->orders_count }}
-              </a>
-            </td>
-
             <td class="px-6 py-4 text-right">
               <!-- Edit Role (Hanya Admin ke pengguna lain) -->
               @if(auth()->user()->isAdmin() && auth()->id() !== $user->id)
@@ -162,7 +155,7 @@
 
               @if(auth()->id() !== $user->id)
                 @if(!$user->isAdmin() || (auth()->user()->isAdmin() && auth()->id() !== $user->id))
-                  <form action="{{ route('admin.users.destroy', $user->id) }}" method="POST" class="inline-block delete-form" data-confirm="Apakah Anda yakin ingin menghapus akun pengguna ini? Semua data terkait (kecuali history order tertentu) akan hilang.">
+                  <form action="{{ route('admin.users.destroy', $user->id) }}" method="POST" class="inline-block delete-form" data-confirm="Apakah Anda yakin ingin menghapus akun pengguna ini?">
                     @csrf
                     @method('DELETE')
                     <button type="submit" class="w-8 h-8 rounded-lg bg-red-50 text-red-600 hover:bg-red-500 hover:text-white flex items-center justify-center transition-colors" title="Hapus Akun">
@@ -175,7 +168,7 @@
           </tr>
         @empty
           <tr>
-             <td colspan="5" class="px-6 py-12 text-center text-gray-500">
+             <td colspan="4" class="px-6 py-12 text-center text-gray-500">
                 <div class="w-16 h-16 mx-auto bg-gray-50 rounded-full flex items-center justify-center text-gray-400 mb-3 text-2xl">
                   <i class="fa-solid fa-users"></i>
                 </div>

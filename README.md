@@ -1,58 +1,234 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# IndoOptik
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+IndoOptik is a Laravel-based optical shop catalog. Customers browse products, configure lens options, add items to cart, and complete checkout through WhatsApp. There is no internal order transaction dashboard by design.
 
-## About Laravel
+## Tech Stack
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+- PHP 8.2+
+- Laravel 12
+- MySQL, MariaDB, PostgreSQL, or SQLite
+- Vite
+- Tailwind CSS 4
+- Alpine.js
+- Font Awesome
+- Pest / PHPUnit
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## Main Features
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+- Public storefront homepage, catalog, product detail, cart, about, and services pages.
+- WhatsApp-only checkout from cart and appointment booking.
+- Admin panel for products, categories, promo codes, testimonials, users, and settings.
+- Session-based cart.
+- Security headers middleware for CSP, frame protection, MIME sniffing, referrer policy, and permissions policy.
+- Responsive public and admin layouts.
 
-## Learning Laravel
+## Requirements
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
-
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
-
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
-
-## Agentic Development
-
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
+Install these before setup:
 
 ```bash
-composer require laravel/boost --dev
-
-php artisan boost:install
+php -v        # 8.2 or newer
+composer -V
+node -v       # 20+ recommended
+npm -v
 ```
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+## Installation
 
-## Contributing
+1. Install PHP dependencies:
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+```bash
+composer install
+```
 
-## Code of Conduct
+2. Install JavaScript dependencies:
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+```bash
+npm install
+```
 
-## Security Vulnerabilities
+3. Create your environment file:
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+```bash
+cp .env.example .env
+php artisan key:generate
+```
 
-## License
+4. Configure database settings in `.env`:
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+```env
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=indo_optik
+DB_USERNAME=root
+DB_PASSWORD=
+```
+
+For local SQLite development:
+
+```bash
+touch database/database.sqlite
+```
+
+Then set:
+
+```env
+DB_CONNECTION=sqlite
+DB_DATABASE=/absolute/path/to/database/database.sqlite
+```
+
+5. Run migrations and seeders:
+
+```bash
+php artisan migrate --seed
+```
+
+6. Link public storage:
+
+```bash
+php artisan storage:link
+```
+
+7. Start the local development server:
+
+```bash
+npm run dev
+```
+
+This runs both Vite and `php artisan serve` through `concurrently`.
+
+## Production Build
+
+Build frontend assets:
+
+```bash
+npm run build
+```
+
+Recommended Laravel production commands:
+
+```bash
+php artisan config:cache
+php artisan route:cache
+php artisan view:cache
+```
+
+Clear caches when changing routes, config, or Blade views:
+
+```bash
+php artisan optimize:clear
+```
+
+## Admin Access
+
+Admin and staff users can access `/admin`.
+
+If seeders are enabled, check `database/seeders/UserSeeder.php` for the seeded admin account. If you need to create one manually, update an existing user role in Tinker:
+
+```bash
+php artisan tinker
+```
+
+```php
+$user = App\Models\User::where('email', 'admin@example.com')->first();
+$user->update(['role' => App\Models\User::ROLE_ADMIN]);
+```
+
+## WhatsApp Checkout Flow
+
+The store is intentionally one-way:
+
+1. Customer adds products to cart.
+2. Customer clicks checkout via WhatsApp.
+3. The cart builds a formatted WhatsApp message.
+4. Customer confirms order directly with the shop through WhatsApp.
+
+Because of this, admin order routes and order dashboard screens are not part of the active admin navigation.
+
+Configure the WhatsApp number from admin settings or the `settings` table using the `whatsapp_number` key. Use international format without `+`, for example:
+
+```text
+6281234567890
+```
+
+## Testing
+
+Run all tests:
+
+```bash
+php artisan test
+```
+
+Run only unit tests:
+
+```bash
+php artisan test --testsuite=Unit
+```
+
+Run only feature tests:
+
+```bash
+php artisan test --testsuite=Feature
+```
+
+The test environment uses in-memory SQLite as configured in `phpunit.xml`.
+
+## Code Quality Checklist
+
+Before handing off changes:
+
+```bash
+php artisan test
+npm run build
+php artisan route:list --except-vendor
+```
+
+Also verify these manually in a browser:
+
+- Homepage at desktop, tablet, and mobile widths.
+- Mobile/tablet navbar drawer opens and closes.
+- Cart checkout opens WhatsApp with a generated message.
+- Admin index pages do not force horizontal page scrolling on mobile.
+- `/admin` dashboard shows catalog/content metrics, not transaction metrics.
+
+## Useful Paths
+
+- Public routes: `routes/web.php`
+- Public layout: `resources/views/layouts/app.blade.php`
+- Admin layout: `resources/views/layouts/admin.blade.php`
+- Homepage: `resources/views/pages/home.blade.php`
+- Cart: `resources/views/pages/cart/index.blade.php`
+- Admin dashboard: `resources/views/admin/dashboard.blade.php`
+- CSS entry: `resources/css/app.css`
+- JS entry: `resources/js/app.js`
+- Security headers: `app/Http/Middleware/SecurityHeaders.php`
+
+## Troubleshooting
+
+If assets do not update:
+
+```bash
+npm run build
+php artisan view:clear
+```
+
+If routes behave unexpectedly:
+
+```bash
+php artisan route:clear
+php artisan route:list --except-vendor
+```
+
+If uploaded images are not visible:
+
+```bash
+php artisan storage:link
+```
+
+If tests fail on database tables:
+
+```bash
+php artisan migrate:fresh --seed
+php artisan test
+```

@@ -14,6 +14,11 @@ function initScrollAnimations() {
     const els = document.querySelectorAll("[data-animate]");
     if (!els.length) return;
 
+    if (!("IntersectionObserver" in window)) {
+        els.forEach((el) => el.classList.add("animated"));
+        return;
+    }
+
     const observer = new IntersectionObserver(
         (entries) => {
             entries.forEach((entry) => {
@@ -26,7 +31,10 @@ function initScrollAnimations() {
         { threshold: 0.1, rootMargin: "0px 0px -40px 0px" },
     );
 
-    els.forEach((el) => observer.observe(el));
+    els.forEach((el) => {
+        el.classList.add("will-animate");
+        observer.observe(el);
+    });
 }
 
 /* =========================================
@@ -174,10 +182,79 @@ function initMobileDrawer() {
     });
 
     mobileDrawer
-        .querySelectorAll(".mobile-drawer-nav a, .mobile-drawer-footer a")
+        .querySelectorAll(".mobile-drawer-nav a, .mobile-drawer-footer a, .mobile-drawer-footer button")
         .forEach((link) => {
             link.addEventListener("click", closeDrawer);
         });
+}
+
+/* =========================================
+   IndoOptik — Navbar User Dropdown
+   ========================================= */
+function initUserDropdown() {
+    const btn = document.getElementById("user-dropdown-btn");
+    const menu = document.getElementById("user-dropdown-menu");
+    if (!btn || !menu) return;
+
+    function close() {
+        menu.style.display = "none";
+        btn.setAttribute("aria-expanded", "false");
+    }
+
+    btn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        const isOpen = menu.style.display === "block";
+        menu.style.display = isOpen ? "none" : "block";
+        btn.setAttribute("aria-expanded", String(!isOpen));
+    });
+
+    menu.addEventListener("click", (e) => e.stopPropagation());
+    document.addEventListener("click", close);
+    document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape") close();
+    });
+}
+
+/* =========================================
+   IndoOptik — Admin UI
+   ========================================= */
+function initAdminSidebar() {
+    const toggle = document.getElementById("sidebar-toggle");
+    const sidebar = document.querySelector(".admin-sidebar");
+    const overlay = document.getElementById("sidebar-overlay");
+    if (!toggle || !sidebar || !overlay) return;
+
+    function closeSidebar() {
+        sidebar.classList.add("-translate-x-full");
+        overlay.classList.add("hidden");
+        toggle.setAttribute("aria-expanded", "false");
+    }
+
+    toggle.setAttribute("aria-expanded", "false");
+    toggle.addEventListener("click", () => {
+        const willOpen = sidebar.classList.contains("-translate-x-full");
+        sidebar.classList.toggle("-translate-x-full");
+        overlay.classList.toggle("hidden");
+        toggle.setAttribute("aria-expanded", String(willOpen));
+    });
+
+    overlay.addEventListener("click", closeSidebar);
+    document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape") closeSidebar();
+    });
+}
+
+function initConfirmForms() {
+    document.querySelectorAll(".delete-form, [data-confirm-form]").forEach((form) => {
+        form.addEventListener("submit", (e) => {
+            const message =
+                form.getAttribute("data-confirm") ||
+                "Apakah Anda yakin ingin melanjutkan?";
+            if (!window.confirm(message)) {
+                e.preventDefault();
+            }
+        });
+    });
 }
 
 /* =========================================
@@ -805,14 +882,39 @@ function initProductPage() {
    ========================================= */
 function initCalendar() {
     const calDays = document.querySelectorAll("[data-cal-day]");
-    const timeBtns = document.querySelectorAll("[data-time-slot]");
+    const timeBtns = document.querySelectorAll("[data-time-slot], [data-time-btn]");
 
     calDays.forEach((day) => {
         day.addEventListener("click", () => {
-            calDays.forEach((d) =>
-                d.classList.remove("bg-indigo-600", "text-white", "selected"),
+            calDays.forEach((d) => {
+                d.classList.remove(
+                    "bg-indigo-500",
+                    "bg-indigo-600",
+                    "text-white",
+                    "font-bold",
+                    "shadow-md",
+                    "shadow-indigo-200",
+                    "selected",
+                );
+                d.classList.add(
+                    "hover:bg-indigo-50",
+                    "hover:text-indigo-600",
+                    "text-neutral-700",
+                );
+            });
+            day.classList.add(
+                "bg-indigo-500",
+                "text-white",
+                "font-bold",
+                "shadow-md",
+                "shadow-indigo-200",
+                "selected",
             );
-            day.classList.add("bg-indigo-600", "text-white", "selected");
+            day.classList.remove(
+                "hover:bg-indigo-50",
+                "hover:text-indigo-600",
+                "text-neutral-700",
+            );
         });
     });
 
@@ -823,6 +925,7 @@ function initCalendar() {
                     "border-indigo-500",
                     "bg-indigo-50",
                     "text-indigo-600",
+                    "font-bold",
                     "selected",
                 ),
             );
@@ -830,6 +933,7 @@ function initCalendar() {
                 "border-indigo-500",
                 "bg-indigo-50",
                 "text-indigo-600",
+                "font-bold",
                 "selected",
             );
         });
@@ -841,20 +945,30 @@ function initCalendar() {
    ========================================= */
 function initWhatsAppBooking() {
     const form = document.getElementById("booking-form");
-    const btn = document.getElementById("booking-wa-btn");
+    const btn =
+        document.getElementById("wa-booking-btn") ||
+        document.getElementById("booking-wa-btn");
     if (!form || !btn) return;
 
     btn.addEventListener("click", (e) => {
         e.preventDefault();
         const name =
-            form.querySelector('[name="customer_name"]')?.value?.trim() || "";
+            form.querySelector('[name="customer_name"]')?.value?.trim() ||
+            form.querySelector('[name="name"]')?.value?.trim() ||
+            "";
         const phone =
-            form.querySelector('[name="customer_phone"]')?.value?.trim() || "";
+            form.querySelector('[name="customer_phone"]')?.value?.trim() ||
+            form.querySelector('[name="phone"]')?.value?.trim() ||
+            "";
+        const checkedService = form.querySelector(
+            '[name="service"]:checked, [name="service_type"]:checked',
+        );
         const service =
-            form.querySelector(
-                '[name="service_type"] input:checked + div [data-service-label]',
-            )?.textContent ||
-            form.querySelector('[name="service_type"]')?.value ||
+            checkedService
+                ?.closest("label")
+                ?.querySelector(".block.font-bold")
+                ?.textContent?.trim() ||
+            checkedService?.value ||
             "";
         const selectedDay =
             form
@@ -862,7 +976,7 @@ function initWhatsAppBooking() {
                 ?.textContent?.trim() || "";
         const selectedTime =
             form
-                .querySelector("[data-time-slot].selected")
+                .querySelector("[data-time-slot].selected, [data-time-btn].selected")
                 ?.textContent?.trim() || "";
         const whatsappNumber =
             document.getElementById("main-navbar")?.dataset.waNumber ||
@@ -877,7 +991,7 @@ function initWhatsAppBooking() {
             return;
         }
 
-        const msg = `Halo IndoOptik! Saya ingin membuat janji:\n\n👤 Nama: ${name}\n📞 Telepon: ${phone}\n🔧 Layanan: ${service}\n📅 Tanggal: ${selectedDay}\n⏰ Waktu: ${selectedTime}\n\nMohon konfirmasinya. Terima kasih!`;
+        const msg = `Halo IndoOptik! Saya ingin membuat janji:\n\nNama: ${name}\nTelepon: ${phone}\nLayanan: ${service}\nTanggal: ${selectedDay || "-"}\nWaktu: ${selectedTime || "-"}\n\nMohon konfirmasinya. Terima kasih!`;
         window.open(
             `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(msg)}`,
             "_blank",
@@ -894,6 +1008,9 @@ document.addEventListener("DOMContentLoaded", () => {
     initCounters();
     initNavbarScroll();
     initMobileDrawer();
+    initUserDropdown();
+    initAdminSidebar();
+    initConfirmForms();
     initCartBadge();
     initCatalogTabs();
     initProductPage();
