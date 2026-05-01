@@ -10,27 +10,27 @@
 
 @section('content')
 <div class="bg-white rounded-2xl border border-zinc-200 shadow-sm flex flex-col">
-  
+
   <!-- Role Tabs -->
-  <div class="border-b border-zinc-100 px-6 pt-4 flex gap-6 overflow-x-auto no-scrollbar">
-    <a href="{{ request()->fullUrlWithQuery(['role' => '']) }}" 
+  <div class="border-b border-zinc-100 px-6 pt-4 flex flex-wrap gap-3 sm:gap-6">
+    <a href="{{ request()->fullUrlWithQuery(['role' => '']) }}"
        class="pb-4 text-sm font-bold whitespace-nowrap {{ !request('role') ? 'text-indigo-600 border-b-2 border-indigo-600' : 'text-gray-500 hover:text-neutral-900' }}">
-      Semua Pengguna 
+      Semua Pengguna
       <span class="ml-1.5 inline-flex items-center justify-center bg-gray-100 text-gray-600 text-[10px] w-5 h-5 rounded-full">{{ $roleCounts['total'] ?? 0 }}</span>
     </a>
-    <a href="{{ request()->fullUrlWithQuery(['role' => \App\Models\User::ROLE_USER]) }}" 
+    <a href="{{ request()->fullUrlWithQuery(['role' => \App\Models\User::ROLE_USER]) }}"
        class="pb-4 text-sm font-bold whitespace-nowrap {{ request('role') === \App\Models\User::ROLE_USER ? 'text-indigo-600 border-b-2 border-indigo-600' : 'text-gray-500 hover:text-neutral-900' }}">
-      Pelanggan 
+      Pelanggan
       <span class="ml-1.5 inline-flex items-center justify-center bg-indigo-100 text-indigo-700 text-[10px] w-5 h-5 rounded-full">{{ $roleCounts['user'] ?? 0 }}</span>
     </a>
-    <a href="{{ request()->fullUrlWithQuery(['role' => \App\Models\User::ROLE_STAFF]) }}" 
+    <a href="{{ request()->fullUrlWithQuery(['role' => \App\Models\User::ROLE_STAFF]) }}"
        class="pb-4 text-sm font-bold whitespace-nowrap {{ request('role') === \App\Models\User::ROLE_STAFF ? 'text-amber-600 border-b-2 border-amber-600' : 'text-gray-500 hover:text-neutral-900' }}">
-      Staff 
+      Staff
       <span class="ml-1.5 inline-flex items-center justify-center bg-amber-100 text-amber-700 text-[10px] w-5 h-5 rounded-full">{{ $roleCounts['staff'] ?? 0 }}</span>
     </a>
-    <a href="{{ request()->fullUrlWithQuery(['role' => \App\Models\User::ROLE_ADMIN]) }}" 
+    <a href="{{ request()->fullUrlWithQuery(['role' => \App\Models\User::ROLE_ADMIN]) }}"
        class="pb-4 text-sm font-bold whitespace-nowrap {{ request('role') === \App\Models\User::ROLE_ADMIN ? 'text-red-600 border-b-2 border-red-600' : 'text-gray-500 hover:text-neutral-900' }}">
-      Admin 
+      Admin
       <span class="ml-1.5 inline-flex items-center justify-center bg-red-100 text-red-700 text-[10px] w-5 h-5 rounded-full">{{ $roleCounts['admin'] ?? 0 }}</span>
     </a>
   </div>
@@ -41,17 +41,17 @@
       @if(request('role'))
         <input type="hidden" name="role" value="{{ request('role') }}">
       @endif
-      
+
       <!-- Search -->
       <div class="relative w-full sm:max-w-md flex-shrink-0">
         <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
           <i class="fa-solid fa-magnifying-glass text-gray-400 text-sm"></i>
         </div>
-        <input 
-          type="text" 
-          name="search" 
+        <input
+          type="text"
+          name="search"
           value="{{ request('search') }}"
-          placeholder="Cari user berdasarkan nama, email, telp..." 
+          placeholder="Cari user berdasarkan nama, email, telp..."
           class="w-full bg-white text-neutral-900 rounded-xl py-2.5 pl-9 pr-4 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500 border border-zinc-200 transition-all placeholder:text-gray-400"
         >
       </div>
@@ -59,7 +59,7 @@
       <button type="submit" class="btn btn-outline btn-sm bg-white border-zinc-200 text-gray-600 hover:bg-gray-50 flex-shrink-0 shrink">
         Cari
       </button>
-      
+
       @if(request()->has('search'))
         <a href="{{ route('admin.users.index', ['role' => request('role')]) }}" class="btn btn-sm text-red-500 hover:bg-red-50 hover:text-red-600 border-transparent shadow-none px-3 flex-shrink-0">
           Reset
@@ -101,7 +101,7 @@
                 </div>
               </div>
             </td>
-            
+
             <td class="px-6 py-4">
               @if($user->role === \App\Models\User::ROLE_ADMIN)
                 <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-bold uppercase tracking-wider bg-red-100 text-red-700">Admin</span>
@@ -124,14 +124,14 @@
                   <button type="button" @click="open = !open" @click.away="open = false" class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-gray-50 text-gray-500 hover:bg-gray-200 transition-colors mr-1" title="Ubah Peran">
                      <i class="fa-solid fa-user-shield"></i>
                   </button>
-                  <div x-show="open" 
+                  <div x-show="open"
                        x-transition:enter="transition ease-out duration-100"
                        x-transition:enter-start="opacity-0 scale-95"
                        x-transition:enter-end="opacity-100 scale-100"
                        x-transition:leave="transition ease-in duration-75"
                        x-transition:leave-start="opacity-100 scale-100"
                        x-transition:leave-end="opacity-0 scale-95"
-                       class="absolute right-0 mt-2 w-48 rounded-xl shadow-xl bg-white ring-1 ring-black ring-opacity-5 divide-y divide-gray-100 z-50 text-left" 
+                       class="absolute right-0 mt-2 w-48 rounded-xl shadow-xl bg-white ring-1 ring-black ring-opacity-5 divide-y divide-gray-100 z-50 text-left"
                        style="display: none;">
                      <form action="{{ route('admin.users.update-role', $user->id) }}" method="POST">
                        @csrf
@@ -180,7 +180,7 @@
       </tbody>
     </table>
   </div>
-  
+
   @if($users->hasPages())
     <div class="px-6 py-4 border-t border-zinc-100 bg-neutral-50/30">
       {{ $users->links() }}

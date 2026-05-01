@@ -34,8 +34,8 @@
   {{-- ============================================================
        TAB FILTERS
        ============================================================ --}}
-  <div class="flex justify-center mb-10 overflow-x-auto hide-scrollbar" data-animate>
-    <div class="flex border-b border-zinc-200">
+  <div class="flex justify-center mb-10" data-animate>
+    <div class="flex flex-wrap justify-center border-b border-zinc-200 gap-2 sm:flex-nowrap sm:gap-0">
       <button
         class="px-6 py-4 text-base font-semibold border-b-[3px] border-indigo-500 text-indigo-600 transition-colors whitespace-nowrap"
         data-tab-btn="kacamata"
