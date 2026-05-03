@@ -72,6 +72,13 @@
           Testimoni
         </a>
 
+        <a href="{{ route('admin.teams.index') }}"
+          class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-all duration-150
+                {{ request()->routeIs('admin.teams.*') ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-500/20' : 'text-slate-400 hover:text-white hover:bg-white/10' }}">
+          <i class="fa-solid fa-people-group w-4 text-center"></i>
+          Tim
+        </a>
+
         <a href="{{ route('admin.promo-codes.index') }}"
           class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-all duration-150
                 {{ request()->routeIs('admin.promo-codes.*') ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-500/20' : 'text-slate-400 hover:text-white hover:bg-white/10' }}">

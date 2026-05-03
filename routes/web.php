@@ -121,6 +121,13 @@ Route::prefix("admin")
         ])->name("testimonials.toggle-status");
         Route::resource("testimonials", Admin\TestimonialController::class);
 
+        // ---- Teams ----
+        Route::patch("teams/{team}/toggle-status", [
+            Admin\TeamController::class,
+            "toggleStatus",
+        ])->name("teams.toggle-status");
+        Route::resource("teams", Admin\TeamController::class);
+
         // ---- Promo Codes ----
         Route::patch("promo-codes/{promoCode}/toggle-status", [
             Admin\PromoCodeController::class,

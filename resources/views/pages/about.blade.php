@@ -146,53 +146,37 @@
 </section>
 
 {{-- ============================================================
-     TEAM / MILESTONES (bonus section)
+     TEAM
      ============================================================ --}}
-<section class="py-24 bg-neutral-50 border-t border-zinc-100">
-  <div class="page-shell">
-    <div class="section-header" data-animate>
-      <span class="section-label">Perjalanan Kami</span>
-      <h2 class="section-title">Tonggak Pencapaian</h2>
-      <p class="section-subtitle">Setiap langkah menuju visi yang lebih besar</p>
+@if($teams->isNotEmpty())
+  <section class="py-24 bg-neutral-50 border-t border-zinc-100">
+    <div class="page-shell">
+      <div class="section-header" data-animate>
+        <span class="section-label">Tim Kami</span>
+        <h2 class="section-title">Kenali Orang di Balik IndoOptik</h2>
+        <p class="section-subtitle">Wajah-wajah yang memastikan Anda mendapatkan layanan terbaik</p>
+      </div>
+
+      <div class="flex flex-wrap justify-center gap-6" data-stagger>
+        @foreach($teams as $team)
+          <div class="w-full sm:w-[calc(50%-12px)] lg:w-[calc(33.333%-16px)] bg-white rounded-[24px] p-7 border border-zinc-100 shadow-sm text-center micro-card-soft">
+            <div class="w-24 h-24 mx-auto rounded-full overflow-hidden border border-zinc-200 bg-neutral-100 mb-4">
+              @if($team->photo)
+                <img src="{{ $team->image_url }}" alt="{{ $team->name }}" class="w-full h-full object-cover">
+              @else
+                <div class="w-full h-full flex items-center justify-center text-xl font-extrabold text-indigo-600 bg-indigo-50">
+                  {{ strtoupper(substr($team->name, 0, 1)) }}
+                </div>
+              @endif
+            </div>
+            <h4 class="text-lg font-extrabold text-neutral-900 mb-1">{{ $team->name }}</h4>
+            <p class="text-gray-500 text-sm leading-relaxed">{{ $team->role }}</p>
+          </div>
+        @endforeach
+      </div>
     </div>
-
-    <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-6" data-stagger>
-
-      <div class="bg-white rounded-[24px] p-7 border border-zinc-100 shadow-sm text-center hover:-translate-y-1 hover:shadow-lg transition-all duration-300">
-        <div class="w-14 h-14 mx-auto bg-indigo-50 text-indigo-600 rounded-[18px] flex items-center justify-center text-2xl mb-4">
-          <i class="fa-solid fa-store"></i>
-        </div>
-        <h4 class="text-lg font-extrabold text-neutral-900 mb-1">2018</h4>
-        <p class="text-gray-500 text-sm leading-relaxed">Toko pertama IndoOptik dibuka di Jakarta Pusat</p>
-      </div>
-
-      <div class="bg-white rounded-[24px] p-7 border border-zinc-100 shadow-sm text-center hover:-translate-y-1 hover:shadow-lg transition-all duration-300">
-        <div class="w-14 h-14 mx-auto bg-indigo-50 text-indigo-600 rounded-[18px] flex items-center justify-center text-2xl mb-4">
-          <i class="fa-solid fa-trophy"></i>
-        </div>
-        <h4 class="text-lg font-extrabold text-neutral-900 mb-1">2020</h4>
-        <p class="text-gray-500 text-sm leading-relaxed">Meraih penghargaan Optik Terbaik Pilihan Pelanggan</p>
-      </div>
-
-      <div class="bg-white rounded-[24px] p-7 border border-zinc-100 shadow-sm text-center hover:-translate-y-1 hover:shadow-lg transition-all duration-300">
-        <div class="w-14 h-14 mx-auto bg-indigo-50 text-indigo-600 rounded-[18px] flex items-center justify-center text-2xl mb-4">
-          <i class="fa-solid fa-globe"></i>
-        </div>
-        <h4 class="text-lg font-extrabold text-neutral-900 mb-1">2022</h4>
-        <p class="text-gray-500 text-sm leading-relaxed">Peluncuran platform belanja kacamata online nasional</p>
-      </div>
-
-      <div class="bg-white rounded-[24px] p-7 border border-zinc-100 shadow-sm text-center hover:-translate-y-1 hover:shadow-lg transition-all duration-300">
-        <div class="w-14 h-14 mx-auto bg-indigo-50 text-indigo-600 rounded-[18px] flex items-center justify-center text-2xl mb-4">
-          <i class="fa-solid fa-users"></i>
-        </div>
-        <h4 class="text-lg font-extrabold text-neutral-900 mb-1">2024</h4>
-        <p class="text-gray-500 text-sm leading-relaxed">Lebih dari 15.000 pelanggan puas di seluruh Indonesia</p>
-      </div>
-
-    </div>
-  </div>
-</section>
+  </section>
+@endif
 
 {{-- ============================================================
      CTA SECTION

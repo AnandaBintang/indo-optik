@@ -34,7 +34,7 @@
           <i class="fa-solid fa-calendar-check text-base"></i>
           Buat Janji Temu
         </a>
-        <a href="{{ route('catalog.index') }}" class="btn btn-xl w-full border border-white/80 bg-white text-neutral-950 shadow-lg shadow-neutral-950/20 hover:bg-indigo-50 hover:text-indigo-700 sm:w-auto" id="hero-catalog-btn">
+        <a href="{{ route('catalog.index') }}" class="btn btn-xl btn-light w-full sm:w-auto" id="hero-catalog-btn">
           <i class="fa-solid fa-magnifying-glass text-base"></i>
           Lihat Katalog
         </a>
@@ -104,11 +104,11 @@
     <div class="grid md:grid-cols-3 gap-6" data-stagger>
 
       {{-- Kacamata --}}
-      <a href="{{ route('catalog.index') }}" class="group relative h-[420px] rounded-[32px] overflow-hidden shadow-md hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 block">
+      <a href="{{ route('catalog.index') }}" class="group micro-card relative h-[420px] rounded-[32px] overflow-hidden shadow-md block">
         <img
           src="https://images.unsplash.com/photo-1574258495973-f010dfbb5371?auto=format&fit=crop&q=80&w=800"
           alt="Kacamata frame premium"
-          class="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+          class="absolute inset-0 w-full h-full object-cover micro-zoom"
           loading="lazy"
         />
         <div class="absolute inset-0 bg-gradient-to-t from-neutral-900/90 via-neutral-900/20 to-transparent"></div>
@@ -125,11 +125,11 @@
       </a>
 
       {{-- Lensa --}}
-      <a href="{{ route('catalog.index') }}" class="group relative h-[420px] rounded-[32px] overflow-hidden shadow-md hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 block">
+      <a href="{{ route('catalog.index') }}" class="group micro-card relative h-[420px] rounded-[32px] overflow-hidden shadow-md block">
         <img
           src="https://images.unsplash.com/photo-1517948430535-1e2469d314fe?q=80&w=2070&auto=format&fit=crop"
           alt="Lensa berkualitas tinggi"
-          class="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+          class="absolute inset-0 w-full h-full object-cover micro-zoom"
           loading="lazy"
         />
         <div class="absolute inset-0 bg-gradient-to-t from-neutral-900/90 via-neutral-900/20 to-transparent"></div>
@@ -146,11 +146,11 @@
       </a>
 
       {{-- Kontak Lensa --}}
-      <a href="{{ route('catalog.index') }}" class="group relative h-[420px] rounded-[32px] overflow-hidden shadow-md hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 block">
+      <a href="{{ route('catalog.index') }}" class="group micro-card relative h-[420px] rounded-[32px] overflow-hidden shadow-md block">
         <img
           src="https://plus.unsplash.com/premium_photo-1663048816150-1638f707cea2?q=80&w=2071&auto=format&fit=crop"
           alt="Kontak lensa softlens"
-          class="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+          class="absolute inset-0 w-full h-full object-cover micro-zoom"
           loading="lazy"
         />
         <div class="absolute inset-0 bg-gradient-to-t from-neutral-900/90 via-neutral-900/20 to-transparent"></div>
@@ -183,14 +183,14 @@
 
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 xl:gap-8" data-stagger>
       @forelse($featuredProducts ?? [] as $product)
-        <a href="{{ route('products.show', $product->slug) }}"
-           class="group bg-white rounded-[24px] border border-zinc-100 shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden flex flex-col hover:-translate-y-1 block">
+          <a href="{{ route('products.show', $product->slug) }}"
+            class="group micro-card-soft bg-white rounded-[24px] border border-zinc-100 shadow-sm overflow-hidden flex flex-col block">
           <div class="aspect-[4/3] bg-neutral-100 overflow-hidden relative">
             @if($product->image)
               <img
                 src="{{ $product->image_url }}"
                 alt="{{ $product->name }}"
-                class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                class="w-full h-full object-cover micro-zoom"
                 loading="lazy"
               />
             @else
@@ -232,12 +232,12 @@
         </a>
       @empty
         {{-- Placeholder Card 1 --}}
-        <a href="{{ route('catalog.index') }}" class="group bg-white rounded-[24px] border border-zinc-100 shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden flex flex-col hover:-translate-y-1 block">
+        <a href="{{ route('catalog.index') }}" class="group micro-card-soft bg-white rounded-[24px] border border-zinc-100 shadow-sm overflow-hidden flex flex-col block">
           <div class="aspect-[4/3] bg-neutral-100 overflow-hidden relative">
             <img
               src="https://images.unsplash.com/photo-1511499767150-a48a237f0083?auto=format&fit=crop&q=80&w=400"
               alt="Classic Round Frame"
-              class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+              class="w-full h-full object-cover micro-zoom"
               loading="lazy"
             />
             <span class="absolute top-3 left-3 bg-white/90 backdrop-blur text-indigo-600 text-[10px] font-bold px-2 py-1 rounded-full">

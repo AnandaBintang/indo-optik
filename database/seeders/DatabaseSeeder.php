@@ -9,6 +9,7 @@ use Database\Seeders\ProductSeeder;
 use Database\Seeders\TestimonialSeeder;
 use Database\Seeders\PromoCodeSeeder;
 use Database\Seeders\UserSeeder;
+use Database\Seeders\TeamSeeder;
 
 class DatabaseSeeder extends Seeder
 {
@@ -22,6 +23,7 @@ class DatabaseSeeder extends Seeder
             CategorySeeder::class,
             ProductSeeder::class,
             TestimonialSeeder::class,
+            TeamSeeder::class,
             PromoCodeSeeder::class,
             UserSeeder::class,
         ]);
