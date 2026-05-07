@@ -35,7 +35,6 @@ services:
     environment:
       MYSQL_DATABASE: ${DB_DATABASE:-indo_optik}
       MYSQL_ROOT_PASSWORD: ${DB_PASSWORD:-secret}
-    command: --default-authentication-plugin=mysql_native_password
     volumes:
       - db_data:/var/lib/mysql
     healthcheck:
