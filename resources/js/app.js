@@ -1,6 +1,6 @@
 import "./bootstrap";
 
-import Alpine from "alpinejs";
+import Alpine from "@alpinejs/csp";
 import "@fortawesome/fontawesome-free/css/all.min.css";
 
 window.Alpine = Alpine;
