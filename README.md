@@ -140,7 +140,7 @@ Set at least these values in `.env`:
 ```env
 APP_ENV=production
 APP_DEBUG=false
-APP_URL=https://your-domain.com
+APP_URL=https://indooptik.web.id
 
 DB_CONNECTION=mysql
 DB_HOST=db
@@ -148,22 +148,58 @@ DB_PORT=3306
 DB_DATABASE=indo_optik
 DB_USERNAME=root
 DB_PASSWORD=change_this_password
+SESSION_DRIVER=file
+CACHE_STORE=file
+QUEUE_CONNECTION=sync
 ```
 
 Optional compose variables:
 
 ```env
-APP_PORT=8080
+APP_PORT=3001
 RUN_MIGRATIONS=true
 ```
 
 Notes for multi-service VPS:
 
 - MySQL service is internal-only by default (no host port published), so it will not conflict with other DB containers.
-- App HTTP port defaults to `8080` to reduce collision risk with existing services on port `80`.
+- App HTTP port defaults to `3001`, matching the recommended host Nginx reverse proxy target.
 - If needed, change `APP_PORT` in `.env` to any free host port.
 - This stack uses `mysql:8.4`; do not add legacy `--default-authentication-plugin=mysql_native_password` command flags.
 - If MySQL repeatedly restarts during first boot, reset containers and volumes with `docker compose down -v` then run `docker compose up -d --build`.
+- Uploads are persisted safely via a dedicated Docker volume mounted to `storage/app/public` (used by `php artisan storage:link`).
+
+### Host Nginx reverse proxy (`/etc/nginx/sites-available/indooptik`)
+
+```nginx
+server {
+    listen 80;
+    server_name indooptik.web.id;
+
+    location / {
+        proxy_pass http://127.0.0.1:3001;
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+}
+```
+
+Enable site and reload:
+
+```bash
+sudo ln -sf /etc/nginx/sites-available/indooptik /etc/nginx/sites-enabled/indooptik
+sudo nginx -t
+sudo systemctl reload nginx
+```
+
+Then enable HTTPS:
+
+```bash
+sudo certbot --nginx -d indooptik.web.id
+```
 
 ### 2) Build and run containers
 
@@ -206,14 +242,14 @@ What it does:
 ### One-time setup on VPS
 
 ```bash
-cd /var/www/indo-optik
+cd /root/indo-optik
 chmod +x scripts/vps-autodeploy.sh
 ```
 
 Optional environment overrides:
 
 ```bash
-export APP_DIR=/var/www/indo-optik
+export APP_DIR=/root/indo-optik
 export BRANCH=main
 export REMOTE=origin
 export COMPOSE_FILE=docker-compose.yml
@@ -235,7 +271,7 @@ crontab -e
 Add:
 
 ```cron
-*/5 * * * * /bin/bash /var/www/indo-optik/scripts/vps-autodeploy.sh >> /var/log/indooptik-deploy.log 2>&1
+*/5 * * * * /bin/bash /root/indo-optik/scripts/vps-autodeploy.sh >> /var/log/indooptik-deploy.log 2>&1
 ```
 
 This allows your VPS to auto pull updates from GitHub and auto migrate on each deploy cycle.

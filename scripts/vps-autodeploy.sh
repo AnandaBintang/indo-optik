@@ -6,7 +6,7 @@ set -euo pipefail
 # - Rebuild and restart Docker services
 # - Run database migration safely
 
-APP_DIR="${APP_DIR:-/var/www/indo-optik}"
+APP_DIR="${APP_DIR:-/root/indo-optik}"
 BRANCH="${BRANCH:-main}"
 REMOTE="${REMOTE:-origin}"
 COMPOSE_FILE="${COMPOSE_FILE:-docker-compose.yml}"
@@ -84,6 +84,7 @@ done
 
 log "Running Laravel migration"
 "${COMPOSE_BIN[@]}" -f "$COMPOSE_FILE" exec -T "$APP_SERVICE" php artisan migrate --force --no-interaction
+"${COMPOSE_BIN[@]}" -f "$COMPOSE_FILE" exec -T "$APP_SERVICE" php artisan storage:link --no-interaction || true
 
 log "Clearing and warming Laravel caches"
 "${COMPOSE_BIN[@]}" -f "$COMPOSE_FILE" exec -T "$APP_SERVICE" php artisan optimize:clear --no-interaction

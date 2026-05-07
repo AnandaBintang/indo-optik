@@ -24,7 +24,7 @@ services:
       db:
         condition: service_healthy
     volumes:
-      - app_storage:
+      - app_public_storage:/var/www/html/storage/app/public
     networks:
       - indooptik
 
@@ -47,7 +47,7 @@ services:
 
 volumes:
   db_data:
-  app_storage:
+  app_public_storage:
 
 networks:
   indooptik:
