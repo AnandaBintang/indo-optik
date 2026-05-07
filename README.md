@@ -153,9 +153,15 @@ DB_PASSWORD=change_this_password
 Optional compose variables:
 
 ```env
-APP_PORT=80
+APP_PORT=8080
 RUN_MIGRATIONS=true
 ```
+
+Notes for multi-service VPS:
+
+- MySQL service is internal-only by default (no host port published), so it will not conflict with other DB containers.
+- App HTTP port defaults to `8080` to reduce collision risk with existing services on port `80`.
+- If needed, change `APP_PORT` in `.env` to any free host port.
 
 ### 2) Build and run containers
 
