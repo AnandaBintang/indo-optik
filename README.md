@@ -120,6 +120,118 @@ Clear caches when changing routes, config, or Blade views:
 php artisan optimize:clear
 ```
 
+## Docker (VPS Deployment)
+
+This project now includes a production-ready Docker setup:
+
+- `Dockerfile` for Laravel app build (PHP-FPM + Nginx + compiled Vite assets)
+- `docker-compose.yml` for app + MySQL services
+
+### 1) Prepare environment
+
+Create your production env file on VPS:
+
+```bash
+cp .env.example .env
+```
+
+Set at least these values in `.env`:
+
+```env
+APP_ENV=production
+APP_DEBUG=false
+APP_URL=https://your-domain.com
+
+DB_CONNECTION=mysql
+DB_HOST=db
+DB_PORT=3306
+DB_DATABASE=indo_optik
+DB_USERNAME=root
+DB_PASSWORD=change_this_password
+```
+
+Optional compose variables:
+
+```env
+APP_PORT=80
+RUN_MIGRATIONS=true
+```
+
+### 2) Build and run containers
+
+```bash
+docker compose up -d --build
+```
+
+### 3) Check logs
+
+```bash
+docker compose logs -f app
+docker compose logs -f db
+```
+
+### 4) Stop containers
+
+```bash
+docker compose down
+```
+
+To remove data volumes too (destructive):
+
+```bash
+docker compose down -v
+```
+
+## VPS Auto Deploy Script
+
+Use this script to auto-deploy latest code from GitHub, rebuild containers, and run migrations:
+
+`scripts/vps-autodeploy.sh`
+
+What it does:
+
+- Pull latest commit from your GitHub branch
+- Run `docker compose up -d --build`
+- Run `php artisan migrate --force`
+- Rebuild Laravel caches (`config`, `route`, `view`)
+
+### One-time setup on VPS
+
+```bash
+cd /var/www/indo-optik
+chmod +x scripts/vps-autodeploy.sh
+```
+
+Optional environment overrides:
+
+```bash
+export APP_DIR=/var/www/indo-optik
+export BRANCH=main
+export REMOTE=origin
+export COMPOSE_FILE=docker-compose.yml
+export APP_SERVICE=app
+```
+
+### Manual run
+
+```bash
+./scripts/vps-autodeploy.sh
+```
+
+### Auto run with cron (every 5 minutes)
+
+```bash
+crontab -e
+```
+
+Add:
+
+```cron
+*/5 * * * * /bin/bash /var/www/indo-optik/scripts/vps-autodeploy.sh >> /var/log/indooptik-deploy.log 2>&1
+```
+
+This allows your VPS to auto pull updates from GitHub and auto migrate on each deploy cycle.
+
 ## Admin Access
 
 Admin and staff users can access `/admin`.

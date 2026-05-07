@@ -1,0 +1,15 @@
+.git
+.gitignore
+.DS_Store
+.cursor
+.idea
+.vscode
+node_modules
+vendor
+storage/logs
+storage/framework/cache
+storage/framework/sessions
+storage/framework/testing
+storage/framework/views
+public/storage
+docker-compose.yml
