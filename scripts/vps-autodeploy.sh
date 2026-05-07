@@ -53,12 +53,12 @@ git checkout "$BRANCH"
 git pull --ff-only "$REMOTE" "$BRANCH"
 
 log "Building and restarting containers"
-docker compose -f "$COMPOSE_FILE" up -d --build
+docker-compose -f "$COMPOSE_FILE" up -d --build
 
 log "Waiting for app container to be running"
 START_TIME="$(date +%s)"
 while true; do
-  STATUS="$(docker compose -f "$COMPOSE_FILE" ps --status running --services | grep -E "^${APP_SERVICE}$" || true)"
+  STATUS="$(docker-compose -f "$COMPOSE_FILE" ps --status running --services | grep -E "^${APP_SERVICE}$" || true)"
   if [ "$STATUS" = "$APP_SERVICE" ]; then
     break
   fi
@@ -67,19 +67,19 @@ while true; do
   ELAPSED=$((NOW - START_TIME))
   if [ "$ELAPSED" -ge "$HEALTH_TIMEOUT_SECONDS" ]; then
     log "App service failed to reach running state in ${HEALTH_TIMEOUT_SECONDS}s."
-    docker compose -f "$COMPOSE_FILE" ps
+    docker-compose -f "$COMPOSE_FILE" ps
     exit 1
   fi
   sleep 3
 done
 
 log "Running Laravel migration"
-docker compose -f "$COMPOSE_FILE" exec -T "$APP_SERVICE" php artisan migrate --force --no-interaction
+docker-compose -f "$COMPOSE_FILE" exec -T "$APP_SERVICE" php artisan migrate --force --no-interaction
 
 log "Clearing and warming Laravel caches"
-docker compose -f "$COMPOSE_FILE" exec -T "$APP_SERVICE" php artisan optimize:clear --no-interaction
-docker compose -f "$COMPOSE_FILE" exec -T "$APP_SERVICE" php artisan config:cache --no-interaction
-docker compose -f "$COMPOSE_FILE" exec -T "$APP_SERVICE" php artisan route:cache --no-interaction
-docker compose -f "$COMPOSE_FILE" exec -T "$APP_SERVICE" php artisan view:cache --no-interaction
+docker-compose -f "$COMPOSE_FILE" exec -T "$APP_SERVICE" php artisan optimize:clear --no-interaction
+docker-compose -f "$COMPOSE_FILE" exec -T "$APP_SERVICE" php artisan config:cache --no-interaction
+docker-compose -f "$COMPOSE_FILE" exec -T "$APP_SERVICE" php artisan route:cache --no-interaction
+docker-compose -f "$COMPOSE_FILE" exec -T "$APP_SERVICE" php artisan view:cache --no-interaction
 
 log "Deployment completed successfully."
