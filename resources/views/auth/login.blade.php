@@ -75,7 +75,7 @@
               class="w-full bg-neutral-50 text-neutral-900 rounded-2xl py-3.5 pl-11 pr-12 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white border border-transparent transition-all duration-200 placeholder:text-gray-400"
             />
             <button type="button" @click="show = !show" class="absolute right-4 text-gray-400 hover:text-indigo-600 transition outline-none" aria-label="Tampilkan password">
-              <i class="fa-solid" :class="show ? 'fa-eye' : 'fa-eye-slash'"></i>
+              <i class="fa-solid fa-eye-slash" :class="{ 'fa-eye': show, 'fa-eye-slash': !show }"></i>
             </button>
           </div>
         </div>
