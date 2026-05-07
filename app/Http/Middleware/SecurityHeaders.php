@@ -31,6 +31,7 @@ class SecurityHeaders
     {
         $viteSources = [];
         $scriptEval = '';
+        $formActionSources = ["'self'", 'https://wa.me'];
 
         if (app()->environment('local')) {
             $viteSources = [
@@ -42,6 +43,18 @@ class SecurityHeaders
             $scriptEval = " 'unsafe-eval'";
         }
 
+        $appUrl = (string) config('app.url');
+        $host = parse_url($appUrl, PHP_URL_HOST);
+
+        if (is_string($host) && $host !== '') {
+            $formActionSources[] = 'https://' . $host;
+            $formActionSources[] = 'http://' . $host;
+        }
+
+        $formActionSources = array_values(array_unique(
+            array_filter($formActionSources, fn ($source) => is_string($source) && trim($source) !== '')
+        ));
+
         return implode('; ', [
             "default-src 'self'",
             "base-uri 'self'",
@@ -52,7 +65,7 @@ class SecurityHeaders
             "font-src 'self' https://fonts.gstatic.com data:" . $this->appendSources($viteSources),
             "img-src 'self' data: blob: https:",
             "connect-src 'self'" . $this->appendSources($viteSources),
-            "form-action 'self' https://wa.me",
+            'form-action ' . implode(' ', $formActionSources),
             "upgrade-insecure-requests",
         ]);
     }
