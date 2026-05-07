@@ -95,6 +95,17 @@ class ProductController extends Controller
         // Cast boolean field
         $validated['is_featured'] = $request->boolean('is_featured');
 
+        $colorVariants = $this->normalizeColorVariants(
+            $request->input('color_variants', []),
+            $request->file('color_variants', [])
+        );
+        $lensVariants = $this->normalizeLensVariants(
+            $request->input('lens_variants', [])
+        );
+
+        $validated['color_variants'] = $colorVariants !== [] ? $colorVariants : null;
+        $validated['lens_variants'] = $lensVariants !== [] ? $lensVariants : null;
+
         $product = Product::create($validated);
 
         // Handle additional product images
@@ -168,6 +179,17 @@ class ProductController extends Controller
 
         // Cast boolean field
         $validated['is_featured'] = $request->boolean('is_featured');
+
+        $colorVariants = $this->normalizeColorVariants(
+            $request->input('color_variants', []),
+            $request->file('color_variants', [])
+        );
+        $lensVariants = $this->normalizeLensVariants(
+            $request->input('lens_variants', [])
+        );
+
+        $validated['color_variants'] = $colorVariants !== [] ? $colorVariants : null;
+        $validated['lens_variants'] = $lensVariants !== [] ? $lensVariants : null;
 
         $product->update($validated);
 
@@ -275,5 +297,115 @@ class ProductController extends Controller
         }
 
         return $slug;
+    }
+
+    /**
+     * Normalize color variants from admin inputs.
+     *
+     * @param  array<int, array<string, mixed>>  $variants
+     * @param  array<int, array<string, mixed>>  $uploads
+     * @return array<int, array<string, mixed>>
+     */
+    private function normalizeColorVariants(array $variants, array $uploads = []): array
+    {
+        $normalized = [];
+        $usedKeys = [];
+
+        foreach ($variants as $index => $variant) {
+            $label = trim((string) ($variant['label'] ?? ''));
+            $color = trim((string) ($variant['color'] ?? ''));
+            $imagesRaw = trim((string) ($variant['images'] ?? ''));
+            $uploadedFiles = data_get($uploads, $index . '.image_uploads', []);
+            $uploadedFiles = is_array($uploadedFiles) ? $uploadedFiles : [];
+
+            if ($label === '' && $color === '' && $imagesRaw === '' && $uploadedFiles === []) {
+                continue;
+            }
+
+            $key = $this->uniqueVariantKey($label, $usedKeys, 'color');
+
+            $images = array_values(array_filter(array_map(
+                fn ($img) => trim($img),
+                explode(',', $imagesRaw)
+            )));
+            $uploadedImageUrls = [];
+            foreach ($uploadedFiles as $file) {
+                if (! $file instanceof \Illuminate\Http\UploadedFile) {
+                    continue;
+                }
+
+                $path = $file->store('products/variants', 'public');
+                $uploadedImageUrls[] = Storage::url($path);
+            }
+            $images = array_values(array_unique(array_merge($images, $uploadedImageUrls)));
+
+            $normalized[] = [
+                'key' => $key,
+                'label' => $label !== '' ? $label : ucfirst($key),
+                'color' => $color !== '' ? $color : '#111827',
+                'images' => $images,
+            ];
+        }
+
+        return $normalized;
+    }
+
+    /**
+     * Normalize lens variants from admin inputs.
+     *
+     * @param  array<int, array<string, mixed>>  $variants
+     * @return array<int, array<string, mixed>>
+     */
+    private function normalizeLensVariants(array $variants): array
+    {
+        $normalized = [];
+        $usedKeys = [];
+
+        foreach ($variants as $variant) {
+            $label = trim((string) ($variant['label'] ?? ''));
+            $desc = trim((string) ($variant['desc'] ?? ''));
+            $price = (int) ($variant['price'] ?? 0);
+            $icon = trim((string) ($variant['icon'] ?? ''));
+
+            if ($label === '' && $desc === '' && $price === 0 && $icon === '') {
+                continue;
+            }
+
+            $key = $this->uniqueVariantKey($label, $usedKeys, 'lens');
+
+            $normalized[] = [
+                'key' => $key,
+                'label' => $label !== '' ? $label : ucfirst($key),
+                'desc' => $desc,
+                'priceAddon' => max(0, $price),
+                'icon' => $icon !== '' ? $icon : 'fa-solid fa-eye',
+            ];
+        }
+
+        return $normalized;
+    }
+
+    /**
+     * Build a unique, URL-safe key for variant lists.
+     *
+     * @param  array<int, string>  $usedKeys
+     */
+    private function uniqueVariantKey(string $value, array &$usedKeys, string $fallback): string
+    {
+        $base = Str::slug($value);
+        if ($base === '') {
+            $base = $fallback;
+        }
+
+        $key = $base;
+        $count = 1;
+        while (in_array($key, $usedKeys, true)) {
+            $key = $base . '-' . $count;
+            $count++;
+        }
+
+        $usedKeys[] = $key;
+
+        return $key;
     }
 }

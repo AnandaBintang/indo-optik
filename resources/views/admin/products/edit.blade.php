@@ -23,11 +23,11 @@
         <h2 class="text-lg font-bold text-neutral-900 mb-6 flex items-center gap-2">
           <i class="fa-solid fa-circle-info text-gray-400"></i> Informasi Dasar
         </h2>
-        
+
         <div class="space-y-5">
           <div>
             <label for="name" class="block text-sm font-bold text-neutral-900 mb-2">Nama Produk <span class="text-red-500">*</span></label>
-            <input type="text" id="name" name="name" value="{{ old('name', $product->name) }}" required 
+            <input type="text" id="name" name="name" value="{{ old('name', $product->name) }}" required
               class="w-full bg-neutral-50 rounded-xl py-3 px-4 text-sm font-medium focus:ring-2 focus:ring-indigo-500 border border-zinc-200">
             @error('name') <p class="text-red-500 text-xs mt-1.5">{{ $message }}</p> @enderror
           </div>
@@ -43,10 +43,10 @@
               </select>
               @error('category_id') <p class="text-red-500 text-xs mt-1.5">{{ $message }}</p> @enderror
             </div>
-            
+
             <div>
               <label for="sku" class="block text-sm font-bold text-neutral-900 mb-2">SKU (Kode Barang)</label>
-              <input type="text" id="sku" name="sku" value="{{ old('sku', $product->sku) }}" 
+              <input type="text" id="sku" name="sku" value="{{ old('sku', $product->sku) }}"
                 class="w-full bg-neutral-50 rounded-xl py-3 px-4 text-sm font-medium focus:ring-2 focus:ring-indigo-500 border border-zinc-200 uppercase">
               @error('sku') <p class="text-red-500 text-xs mt-1.5">{{ $message }}</p> @enderror
             </div>
@@ -54,12 +54,149 @@
 
           <div>
             <label for="description" class="block text-sm font-bold text-neutral-900 mb-2">Deskripsi Produk</label>
-            <textarea id="description" name="description" rows="5" 
+            <textarea id="description" name="description" rows="5"
               class="w-full bg-neutral-50 rounded-xl py-3 px-4 text-sm font-medium focus:ring-2 focus:ring-indigo-500 border border-zinc-200">{{ old('description', $product->description) }}</textarea>
             @error('description') <p class="text-red-500 text-xs mt-1.5">{{ $message }}</p> @enderror
           </div>
         </div>
       </div>
+
+        @php
+          $colorVariants = old('color_variants', $product->color_variants ?? []);
+          $lensVariants = old('lens_variants', $product->lens_variants ?? []);
+          if (!is_array($colorVariants) || count($colorVariants) === 0) {
+            $colorVariants = [
+              ['key' => '', 'label' => '', 'color' => '#111827', 'images' => ''],
+            ];
+          }
+          if (!is_array($lensVariants) || count($lensVariants) === 0) {
+            $lensVariants = [
+              [
+                'key' => 'standard',
+                'label' => 'Standar',
+                'desc' => 'Lensa bening standar',
+                'price' => 0,
+                'icon' => 'fa-solid fa-eye',
+              ],
+            ];
+          }
+          $lensIconOptions = [
+            'fa-solid fa-eye' => 'Mata (Standar)',
+            'fa-solid fa-display' => 'Layar (Blue Light)',
+            'fa-solid fa-shield-halved' => 'Shield (Anti Radiasi)',
+            'fa-solid fa-sun' => 'Matahari (Photochromic)',
+            'fa-solid fa-glasses' => 'Kacamata (Premium)',
+          ];
+        @endphp
+
+        <!-- Varian Produk -->
+        <div class="bg-white rounded-2xl border border-zinc-200 shadow-sm p-6 md:p-8">
+          <h2 class="text-lg font-bold text-neutral-900 mb-6 flex items-center gap-2">
+            <i class="fa-solid fa-layer-group text-gray-400"></i> Varian Produk
+          </h2>
+
+          <div class="space-y-6">
+            <div>
+              <div class="flex items-center justify-between mb-3">
+                <div>
+                  <h3 class="text-sm font-bold text-neutral-900">Varian Warna</h3>
+                  <p class="text-xs text-gray-500">Atur label, warna, dan gambar (opsional).</p>
+                </div>
+                <button type="button" id="add-color-variant" class="btn btn-ghost btn-sm">
+                  <i class="fa-solid fa-plus"></i> Tambah Warna
+                </button>
+              </div>
+
+              <div id="color-variant-list" class="space-y-3">
+                @foreach($colorVariants as $index => $variant)
+                  @php
+                    $imagesValue = '';
+                    if (isset($variant['images'])) {
+                      $imagesValue = is_array($variant['images']) ? implode(', ', $variant['images']) : $variant['images'];
+                    }
+                  @endphp
+                  <div class="grid grid-cols-1 md:grid-cols-12 gap-3 items-end" data-variant-row>
+                    <div class="md:col-span-4">
+                      <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Label</label>
+                      <input type="text" name="color_variants[{{ $index }}][label]" value="{{ $variant['label'] ?? '' }}"
+                        class="w-full bg-neutral-50 rounded-xl py-2.5 px-3 text-xs font-medium border border-zinc-200" placeholder="Hitam">
+                    </div>
+                    <div class="md:col-span-2">
+                      <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Warna</label>
+                      <input type="color" name="color_variants[{{ $index }}][color]" value="{{ $variant['color'] ?? '#111827' }}"
+                        class="w-full h-11 rounded-xl border border-zinc-200 bg-white">
+                    </div>
+                    <div class="md:col-span-3">
+                      <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Gambar (URL)</label>
+                      <input type="text" name="color_variants[{{ $index }}][images]" value="{{ $imagesValue }}"
+                        class="w-full bg-neutral-50 rounded-xl py-2.5 px-3 text-xs font-medium border border-zinc-200" placeholder="url1, url2 (pisahkan koma)">
+                    </div>
+                    <div class="md:col-span-2">
+                      <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Upload Gambar</label>
+                      <input type="file" name="color_variants[{{ $index }}][image_uploads][]" multiple accept="image/*"
+                        class="w-full bg-neutral-50 rounded-xl py-2 px-3 text-[11px] font-medium border border-zinc-200">
+                    </div>
+                    <div class="md:col-span-1 flex justify-end">
+                      <button type="button" class="btn btn-ghost btn-sm" data-variant-remove>
+                        <i class="fa-solid fa-trash"></i>
+                      </button>
+                    </div>
+                  </div>
+                @endforeach
+              </div>
+            </div>
+
+            <div>
+              <div class="flex items-center justify-between mb-3">
+                <div>
+                  <h3 class="text-sm font-bold text-neutral-900">Varian Lensa</h3>
+                  <p class="text-xs text-gray-500">Atur label, deskripsi, harga tambahan, dan ikon.</p>
+                </div>
+                <button type="button" id="add-lens-variant" class="btn btn-ghost btn-sm">
+                  <i class="fa-solid fa-plus"></i> Tambah Lensa
+                </button>
+              </div>
+
+              <div id="lens-variant-list" class="space-y-3">
+                @foreach($lensVariants as $index => $variant)
+                  <div class="grid grid-cols-1 md:grid-cols-12 gap-3 items-end" data-variant-row>
+                    <div class="md:col-span-4">
+                      <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Label</label>
+                      <input type="text" name="lens_variants[{{ $index }}][label]" value="{{ $variant['label'] ?? '' }}"
+                        class="w-full bg-neutral-50 rounded-xl py-2.5 px-3 text-xs font-medium border border-zinc-200" placeholder="Standar">
+                    </div>
+                    <div class="md:col-span-2">
+                      <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Harga</label>
+                      <input type="number" name="lens_variants[{{ $index }}][price]" value="{{ $variant['price'] ?? ($variant['priceAddon'] ?? 0) }}" min="0"
+                        class="w-full bg-neutral-50 rounded-xl py-2.5 px-3 text-xs font-medium border border-zinc-200" placeholder="0">
+                    </div>
+                    <div class="md:col-span-3">
+                      <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Deskripsi</label>
+                      <input type="text" name="lens_variants[{{ $index }}][desc]" value="{{ $variant['desc'] ?? '' }}"
+                        class="w-full bg-neutral-50 rounded-xl py-2.5 px-3 text-xs font-medium border border-zinc-200" placeholder="Lensa bening standar">
+                    </div>
+                    <div class="md:col-span-1">
+                      <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Ikon</label>
+                      <select name="lens_variants[{{ $index }}][icon]"
+                        class="w-full bg-neutral-50 rounded-xl py-2.5 px-3 text-xs font-medium border border-zinc-200">
+                        @foreach($lensIconOptions as $iconClass => $iconLabel)
+                          <option value="{{ $iconClass }}" {{ ($variant['icon'] ?? 'fa-solid fa-eye') === $iconClass ? 'selected' : '' }}>
+                            {{ $iconLabel }}
+                          </option>
+                        @endforeach
+                      </select>
+                    </div>
+                    <div class="md:col-span-1 flex justify-end">
+                      <button type="button" class="btn btn-ghost btn-sm" data-variant-remove>
+                        <i class="fa-solid fa-trash"></i>
+                      </button>
+                    </div>
+                  </div>
+                @endforeach
+              </div>
+            </div>
+          </div>
+        </div>
 
       <!-- Harga & Stok -->
       <div class="bg-white rounded-2xl border border-zinc-200 shadow-sm p-6 md:p-8">
@@ -99,7 +236,7 @@
         <h2 class="text-lg font-bold text-neutral-900 mb-6 flex items-center gap-2">
           <i class="fa-solid fa-image text-gray-400"></i> Media Produk
         </h2>
-        
+
         <div class="space-y-5">
           <!-- Gambar Utama -->
           <div x-data="{ mode: 'file', previewUrl: '{{ $product->image_url }}', url: '' }">
@@ -113,8 +250,8 @@
             <!-- File Upload Mode -->
             <template x-if="mode === 'file'">
               <div class="mt-1 relative rounded-xl hover:border-indigo-400 hover:bg-indigo-50/50 transition-all cursor-pointer group border border-zinc-200 bg-gray-50 p-2">
-                
-                <input id="image" name="image" type="file" accept="image/*" class="absolute inset-0 w-full h-full opacity-0 z-20 cursor-pointer" 
+
+                <input id="image" name="image" type="file" accept="image/*" class="absolute inset-0 w-full h-full opacity-0 z-20 cursor-pointer"
                   @change="
                     if($event.target.files.length) {
                       url = '';
@@ -122,7 +259,7 @@
                     }
                   "
                 >
-                
+
                 <!-- Placeholder if no image -->
                 <div x-show="!previewUrl && !url" class="space-y-1 text-center relative z-10 pointer-events-none p-4">
                   <i class="fa-solid fa-cloud-arrow-up text-3xl text-gray-400 mb-2 group-hover:scale-110 transition-transform text-indigo-400"></i>
@@ -144,9 +281,9 @@
             <!-- URL Mode -->
             <template x-if="mode === 'url'">
               <div class="mt-1">
-                <input type="url" id="image_url" name="image_url" x-model="url" @input="previewUrl = url" placeholder="https://unsplash.com/photo-..." 
+                <input type="url" id="image_url" name="image_url" x-model="url" @input="previewUrl = url" placeholder="https://unsplash.com/photo-..."
                   class="w-full bg-neutral-50 rounded-xl py-3 px-4 text-sm font-medium border border-zinc-200 focus:ring-2 focus:ring-indigo-500 focus:outline-none mb-3">
-                
+
                 <div x-show="previewUrl" class="relative w-full h-48 rounded-lg overflow-hidden flex items-center justify-center bg-gray-50 border border-zinc-200 p-2">
                   <img :src="previewUrl" class="object-contain w-full h-full rounded-md" @@error="previewUrl = ''">
                 </div>
@@ -161,7 +298,7 @@
           <!-- Gambar Tambahan -->
           <div class="border-t border-zinc-100 pt-5">
             <label class="block text-sm font-bold text-neutral-900 mb-2">Gambar Tambahan</label>
-            
+
             @if($product->images->count() > 0)
               <div class="grid grid-cols-2 gap-3 mb-4">
                 @foreach($product->images as $img)
@@ -238,4 +375,118 @@
     </button>
   </div>
 </form>
+
+<template id="color-variant-template">
+  <div class="grid grid-cols-1 md:grid-cols-12 gap-3 items-end" data-variant-row>
+    <div class="md:col-span-4">
+      <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Label</label>
+      <input type="text" name="color_variants[__INDEX__][label]"
+        class="w-full bg-neutral-50 rounded-xl py-2.5 px-3 text-xs font-medium border border-zinc-200" placeholder="Hitam">
+    </div>
+    <div class="md:col-span-2">
+      <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Warna</label>
+      <input type="color" name="color_variants[__INDEX__][color]" value="#111827"
+        class="w-full h-11 rounded-xl border border-zinc-200 bg-white">
+    </div>
+    <div class="md:col-span-3">
+      <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Gambar (URL)</label>
+      <input type="text" name="color_variants[__INDEX__][images]"
+        class="w-full bg-neutral-50 rounded-xl py-2.5 px-3 text-xs font-medium border border-zinc-200" placeholder="url1, url2 (pisahkan koma)">
+    </div>
+    <div class="md:col-span-2">
+      <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Upload Gambar</label>
+      <input type="file" name="color_variants[__INDEX__][image_uploads][]" multiple accept="image/*"
+        class="w-full bg-neutral-50 rounded-xl py-2 px-3 text-[11px] font-medium border border-zinc-200">
+    </div>
+    <div class="md:col-span-1 flex justify-end">
+      <button type="button" class="btn btn-ghost btn-sm" data-variant-remove>
+        <i class="fa-solid fa-trash"></i>
+      </button>
+    </div>
+  </div>
+</template>
+
+<template id="lens-variant-template">
+  <div class="grid grid-cols-1 md:grid-cols-12 gap-3 items-end" data-variant-row>
+    <div class="md:col-span-4">
+      <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Label</label>
+      <input type="text" name="lens_variants[__INDEX__][label]"
+        class="w-full bg-neutral-50 rounded-xl py-2.5 px-3 text-xs font-medium border border-zinc-200" placeholder="Standar">
+    </div>
+    <div class="md:col-span-2">
+      <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Harga</label>
+      <input type="number" name="lens_variants[__INDEX__][price]" value="0" min="0"
+        class="w-full bg-neutral-50 rounded-xl py-2.5 px-3 text-xs font-medium border border-zinc-200" placeholder="0">
+    </div>
+    <div class="md:col-span-3">
+      <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Deskripsi</label>
+      <input type="text" name="lens_variants[__INDEX__][desc]"
+        class="w-full bg-neutral-50 rounded-xl py-2.5 px-3 text-xs font-medium border border-zinc-200" placeholder="Lensa bening standar">
+    </div>
+    <div class="md:col-span-1">
+      <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Ikon</label>
+      <select name="lens_variants[__INDEX__][icon]"
+        class="w-full bg-neutral-50 rounded-xl py-2.5 px-3 text-xs font-medium border border-zinc-200">
+        @foreach($lensIconOptions as $iconClass => $iconLabel)
+          <option value="{{ $iconClass }}" {{ $iconClass === 'fa-solid fa-eye' ? 'selected' : '' }}>
+            {{ $iconLabel }}
+          </option>
+        @endforeach
+      </select>
+    </div>
+    <div class="md:col-span-1 flex justify-end">
+      <button type="button" class="btn btn-ghost btn-sm" data-variant-remove>
+        <i class="fa-solid fa-trash"></i>
+      </button>
+    </div>
+  </div>
+</template>
+
+@push('scripts')
+<script>
+  (function () {
+    const colorList = document.getElementById('color-variant-list');
+    const lensList = document.getElementById('lens-variant-list');
+    const colorTemplate = document.getElementById('color-variant-template');
+    const lensTemplate = document.getElementById('lens-variant-template');
+    const addColorBtn = document.getElementById('add-color-variant');
+    const addLensBtn = document.getElementById('add-lens-variant');
+
+    function bindRemove(container) {
+      if (!container) return;
+      container.addEventListener('click', function (e) {
+        const btn = e.target.closest('[data-variant-remove]');
+        if (!btn) return;
+        const row = btn.closest('[data-variant-row]');
+        if (row) row.remove();
+      });
+    }
+
+    function addRow(container, template, index) {
+      if (!container || !template) return;
+      const html = template.innerHTML.replace(/__INDEX__/g, String(index));
+      const wrapper = document.createElement('div');
+      wrapper.innerHTML = html.trim();
+      container.appendChild(wrapper.firstElementChild);
+    }
+
+    if (addColorBtn && colorList && colorTemplate) {
+      let colorIndex = colorList.children.length;
+      addColorBtn.addEventListener('click', function () {
+        addRow(colorList, colorTemplate, colorIndex++);
+      });
+    }
+
+    if (addLensBtn && lensList && lensTemplate) {
+      let lensIndex = lensList.children.length;
+      addLensBtn.addEventListener('click', function () {
+        addRow(lensList, lensTemplate, lensIndex++);
+      });
+    }
+
+    bindRemove(colorList);
+    bindRemove(lensList);
+  })();
+</script>
+@endpush
 @endsection

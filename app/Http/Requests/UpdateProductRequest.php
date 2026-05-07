@@ -87,6 +87,32 @@ class UpdateProductRequest extends FormRequest
             "meta_title" => ["nullable", "string", "max:255"],
 
             "meta_description" => ["nullable", "string", "max:500"],
+            "color_variants" => ["nullable", "array"],
+            "color_variants.*.key" => ["nullable", "string", "max:50"],
+            "color_variants.*.label" => ["nullable", "string", "max:60"],
+            "color_variants.*.color" => ["nullable", "string", "max:20"],
+            "color_variants.*.images" => ["nullable", "string", "max:2000"],
+            "color_variants.*.image_uploads" => ["nullable", "array", "max:6"],
+            "color_variants.*.image_uploads.*" => [
+                "image",
+                "mimes:jpg,jpeg,png,webp",
+                "max:2048",
+            ],
+            "lens_variants" => ["nullable", "array"],
+            "lens_variants.*.key" => ["nullable", "string", "max:50"],
+            "lens_variants.*.label" => ["nullable", "string", "max:80"],
+            "lens_variants.*.desc" => ["nullable", "string", "max:200"],
+            "lens_variants.*.price" => ["nullable", "integer", "min:0"],
+            "lens_variants.*.icon" => [
+                "nullable",
+                Rule::in([
+                    "fa-solid fa-eye",
+                    "fa-solid fa-display",
+                    "fa-solid fa-shield-halved",
+                    "fa-solid fa-sun",
+                    "fa-solid fa-glasses",
+                ]),
+            ],
         ];
     }
 
@@ -113,6 +139,8 @@ class UpdateProductRequest extends FormRequest
             "delete_images" => "gambar yang dihapus",
             "meta_title" => "meta title",
             "meta_description" => "meta description",
+            "color_variants" => "varian warna",
+            "lens_variants" => "varian lensa",
         ];
     }
 

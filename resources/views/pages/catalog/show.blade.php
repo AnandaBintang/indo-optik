@@ -8,6 +8,18 @@
 
 @section('content')
 
+@php
+  $colorVariants = is_array($product->color_variants ?? null) ? $product->color_variants : [];
+  $lensVariants = is_array($product->lens_variants ?? null) ? $product->lens_variants : [];
+  $colorVariantList = array_values($colorVariants);
+  $lensVariantList = array_values($lensVariants);
+  $defaultColorLabel = $colorVariantList[0]['label'] ?? 'Hitam';
+  $galleryImages = collect([$product->image_url])
+      ->merge($product->images->pluck('image_url'))
+      ->filter()
+      ->values();
+@endphp
+
 <main class="page-shell py-12 flex-1"
       data-base-price="{{ $product->effective_price ?? $product->price ?? 299000 }}"
       data-orig-price="{{ $product->price ?? 399000 }}">
@@ -160,38 +172,57 @@
       <div>
         <div class="flex justify-between items-end mb-4">
           <h3 class="text-base font-bold text-neutral-900">1. Pilih Warna</h3>
-          <span class="text-sm font-semibold text-indigo-600" id="selected-color-label">Hitam</span>
+            <span class="text-sm font-semibold text-indigo-600" id="selected-color-label">{{ $defaultColorLabel }}</span>
         </div>
         {{-- Color swatches injected by JS via COLOR_VARIANTS; fallback static swatches --}}
         <div class="flex flex-wrap gap-3" id="color-swatches">
-          <button type="button"
-                  class="color-swatch selected w-10 h-10 rounded-full border-[3px] border-indigo-500 shadow-md shadow-indigo-200 transition-all duration-150 ring-2 ring-offset-2 ring-indigo-500"
-                  style="background-color:#1a1a1a;"
-                  data-color="Hitam"
-                  aria-label="Hitam"
-                  aria-pressed="true">
-          </button>
-          <button type="button"
-                  class="color-swatch w-10 h-10 rounded-full border-[3px] border-zinc-200 hover:border-indigo-400 shadow-sm transition-all duration-150"
-                  style="background-color:#8B4513;"
-                  data-color="Coklat"
-                  aria-label="Coklat"
-                  aria-pressed="false">
-          </button>
-          <button type="button"
-                  class="color-swatch w-10 h-10 rounded-full border-[3px] border-zinc-200 hover:border-indigo-400 shadow-sm transition-all duration-150"
-                  style="background-color:#1e40af;"
-                  data-color="Biru"
-                  aria-label="Biru"
-                  aria-pressed="false">
-          </button>
-          <button type="button"
-                  class="color-swatch w-10 h-10 rounded-full border-[3px] border-zinc-200 hover:border-indigo-400 shadow-sm transition-all duration-150"
-                  style="background: linear-gradient(135deg, #c8a45b 0%, #6b3a1f 50%, #1a1a1a 100%);"
-                  data-color="Tortoise"
-                  aria-label="Tortoise"
-                  aria-pressed="false">
-          </button>
+            @if(count($colorVariantList))
+              @foreach($colorVariantList as $index => $variant)
+                @php
+            $key = $variant['key']
+              ?? \Illuminate\Support\Str::slug($variant['label'] ?? 'color');
+            $label = $variant['label'] ?? ucfirst($key);
+            $color = $variant['color'] ?? '#111827';
+            $isSelected = $index === 0;
+                @endphp
+                <button type="button"
+                  class="color-swatch {{ $isSelected ? 'selected w-10 h-10 rounded-full border-[3px] border-indigo-500 shadow-md shadow-indigo-200 transition-all duration-150 ring-2 ring-offset-2 ring-indigo-500' : 'w-10 h-10 rounded-full border-[3px] border-zinc-200 hover:border-indigo-400 shadow-sm transition-all duration-150' }}"
+                  style="background-color:{{ $color }};"
+                  data-color="{{ $key }}"
+                  aria-label="{{ $label }}"
+                  aria-pressed="{{ $isSelected ? 'true' : 'false' }}">
+                </button>
+              @endforeach
+            @else
+              <button type="button"
+                class="color-swatch selected w-10 h-10 rounded-full border-[3px] border-indigo-500 shadow-md shadow-indigo-200 transition-all duration-150 ring-2 ring-offset-2 ring-indigo-500"
+                style="background-color:#1a1a1a;"
+                data-color="Hitam"
+                aria-label="Hitam"
+                aria-pressed="true">
+              </button>
+              <button type="button"
+                class="color-swatch w-10 h-10 rounded-full border-[3px] border-zinc-200 hover:border-indigo-400 shadow-sm transition-all duration-150"
+                style="background-color:#8B4513;"
+                data-color="Coklat"
+                aria-label="Coklat"
+                aria-pressed="false">
+              </button>
+              <button type="button"
+                class="color-swatch w-10 h-10 rounded-full border-[3px] border-zinc-200 hover:border-indigo-400 shadow-sm transition-all duration-150"
+                style="background-color:#1e40af;"
+                data-color="Biru"
+                aria-label="Biru"
+                aria-pressed="false">
+              </button>
+              <button type="button"
+                class="color-swatch w-10 h-10 rounded-full border-[3px] border-zinc-200 hover:border-indigo-400 shadow-sm transition-all duration-150"
+                style="background: linear-gradient(135deg, #c8a45b 0%, #6b3a1f 50%, #1a1a1a 100%);"
+                data-color="Tortoise"
+                aria-label="Tortoise"
+                aria-pressed="false">
+              </button>
+            @endif
         </div>
       </div>
 
@@ -203,51 +234,74 @@
         </div>
         {{-- Lens options injected by JS via LENS_VARIANTS; fallback static options --}}
         <div class="grid grid-cols-1 md:grid-cols-2 gap-3" id="lens-options" role="radiogroup" aria-label="Tipe Lensa">
-
-          <label class="lens-option selected cursor-pointer" id="lens-standard">
-            <input type="radio" name="lens_type" value="standard" class="sr-only" checked />
-            <div class="border-2 border-indigo-500 bg-indigo-50 rounded-2xl p-4 transition-all duration-200">
-              <div class="flex items-start justify-between mb-1">
-                <span class="font-bold text-sm text-neutral-900">Standar</span>
-                <span class="text-xs font-bold text-indigo-600">+Rp 0</span>
+          @if(count($lensVariantList))
+            @foreach($lensVariantList as $index => $variant)
+              @php
+                $key = $variant['key']
+                  ?? \Illuminate\Support\Str::slug($variant['label'] ?? 'lens');
+                $label = $variant['label'] ?? ucfirst($key);
+                $desc = $variant['desc'] ?? '';
+                $priceAddon = (int) ($variant['priceAddon'] ?? $variant['price'] ?? 0);
+                $isSelected = $index === 0;
+              @endphp
+              <label class="lens-option {{ $isSelected ? 'selected' : '' }} cursor-pointer" id="lens-{{ $key }}">
+                <input type="radio" name="lens_type" value="{{ $key }}" class="sr-only" {{ $isSelected ? 'checked' : '' }} />
+                <div class="border-2 {{ $isSelected ? 'border-indigo-500 bg-indigo-50' : 'border-zinc-200 hover:border-indigo-400 hover:bg-indigo-50/50' }} rounded-2xl p-4 transition-all duration-200">
+                  <div class="flex items-start justify-between mb-1">
+                    <span class="font-bold text-sm text-neutral-900">{{ $label }}</span>
+                    <span class="text-xs font-bold text-indigo-600">+Rp {{ number_format($priceAddon, 0, ',', '.') }}</span>
+                  </div>
+                  @if($desc)
+                    <span class="text-xs text-gray-500">{{ $desc }}</span>
+                  @endif
+                </div>
+              </label>
+            @endforeach
+          @else
+            <label class="lens-option selected cursor-pointer" id="lens-standard">
+              <input type="radio" name="lens_type" value="standard" class="sr-only" checked />
+              <div class="border-2 border-indigo-500 bg-indigo-50 rounded-2xl p-4 transition-all duration-200">
+                <div class="flex items-start justify-between mb-1">
+                  <span class="font-bold text-sm text-neutral-900">Standar</span>
+                  <span class="text-xs font-bold text-indigo-600">+Rp 0</span>
+                </div>
+                <span class="text-xs text-gray-500">Lensa plastik standar, cocok untuk penggunaan harian</span>
               </div>
-              <span class="text-xs text-gray-500">Lensa plastik standar, cocok untuk penggunaan harian</span>
-            </div>
-          </label>
+            </label>
 
-          <label class="lens-option cursor-pointer" id="lens-blue-light">
-            <input type="radio" name="lens_type" value="blue_light" class="sr-only" />
-            <div class="border-2 border-zinc-200 hover:border-indigo-400 rounded-2xl p-4 transition-all duration-200 hover:bg-indigo-50/50">
-              <div class="flex items-start justify-between mb-1">
-                <span class="font-bold text-sm text-neutral-900">Anti Blue Light</span>
-                <span class="text-xs font-bold text-indigo-600">+Rp 150.000</span>
+            <label class="lens-option cursor-pointer" id="lens-blue-light">
+              <input type="radio" name="lens_type" value="blue_light" class="sr-only" />
+              <div class="border-2 border-zinc-200 hover:border-indigo-400 rounded-2xl p-4 transition-all duration-200 hover:bg-indigo-50/50">
+                <div class="flex items-start justify-between mb-1">
+                  <span class="font-bold text-sm text-neutral-900">Anti Blue Light</span>
+                  <span class="text-xs font-bold text-indigo-600">+Rp 150.000</span>
+                </div>
+                <span class="text-xs text-gray-500">Perlindungan dari radiasi layar digital</span>
               </div>
-              <span class="text-xs text-gray-500">Perlindungan dari radiasi layar digital</span>
-            </div>
-          </label>
+            </label>
 
-          <label class="lens-option cursor-pointer" id="lens-photochromic">
-            <input type="radio" name="lens_type" value="photochromic" class="sr-only" />
-            <div class="border-2 border-zinc-200 hover:border-indigo-400 rounded-2xl p-4 transition-all duration-200 hover:bg-indigo-50/50">
-              <div class="flex items-start justify-between mb-1">
-                <span class="font-bold text-sm text-neutral-900">Photochromic</span>
-                <span class="text-xs font-bold text-indigo-600">+Rp 300.000</span>
+            <label class="lens-option cursor-pointer" id="lens-photochromic">
+              <input type="radio" name="lens_type" value="photochromic" class="sr-only" />
+              <div class="border-2 border-zinc-200 hover:border-indigo-400 rounded-2xl p-4 transition-all duration-200 hover:bg-indigo-50/50">
+                <div class="flex items-start justify-between mb-1">
+                  <span class="font-bold text-sm text-neutral-900">Photochromic</span>
+                  <span class="text-xs font-bold text-indigo-600">+Rp 300.000</span>
+                </div>
+                <span class="text-xs text-gray-500">Lensa adaptif berubah sesuai cahaya</span>
               </div>
-              <span class="text-xs text-gray-500">Lensa adaptif berubah sesuai cahaya</span>
-            </div>
-          </label>
+            </label>
 
-          <label class="lens-option cursor-pointer" id="lens-progressive">
-            <input type="radio" name="lens_type" value="progressive" class="sr-only" />
-            <div class="border-2 border-zinc-200 hover:border-indigo-400 rounded-2xl p-4 transition-all duration-200 hover:bg-indigo-50/50">
-              <div class="flex items-start justify-between mb-1">
-                <span class="font-bold text-sm text-neutral-900">Progresif</span>
-                <span class="text-xs font-bold text-indigo-600">+Rp 500.000</span>
+            <label class="lens-option cursor-pointer" id="lens-progressive">
+              <input type="radio" name="lens_type" value="progressive" class="sr-only" />
+              <div class="border-2 border-zinc-200 hover:border-indigo-400 rounded-2xl p-4 transition-all duration-200 hover:bg-indigo-50/50">
+                <div class="flex items-start justify-between mb-1">
+                  <span class="font-bold text-sm text-neutral-900">Progresif</span>
+                  <span class="text-xs font-bold text-indigo-600">+Rp 500.000</span>
+                </div>
+                <span class="text-xs text-gray-500">Untuk jauh, menengah, dan dekat sekaligus</span>
               </div>
-              <span class="text-xs text-gray-500">Untuk jauh, menengah, dan dekat sekaligus</span>
-            </div>
-          </label>
-
+            </label>
+          @endif
         </div>
       </div>
 
@@ -356,6 +410,7 @@
             />
             <button type="button"
                     id="apply-promo-btn"
+                  data-promo-url="{{ route('cart.promo') }}"
                     class="btn btn-outline btn-sm"
                     style="justify-content:center;min-width:120px;">
               Apply
@@ -388,6 +443,7 @@
         <button
           class="btn btn-outline btn-xl flex-1 justify-center"
           id="add-to-cart-btn"
+          data-cart-url="{{ route('cart.add') }}"
           data-product-id="{{ $product->id ?? '' }}"
           data-product-name="{{ $product->name ?? 'Classic Round Frame' }}"
           data-product-slug="{{ $product->slug ?? 'classic-round-frame' }}"
@@ -418,275 +474,14 @@
   </div>
 </main>
 
-@push('scripts')
-<script>
-(function () {
-  'use strict';
-
-  document.addEventListener('DOMContentLoaded', function () {
-
-    // ---- Color Swatches ----
-    const swatches = document.querySelectorAll('.color-swatch');
-    const colorLabel = document.getElementById('selected-color-label');
-
-    swatches.forEach(function (swatch) {
-      swatch.addEventListener('click', function () {
-        swatches.forEach(function (s) {
-          s.classList.remove('ring-2', 'ring-offset-2', 'ring-indigo-500', 'border-indigo-500');
-          s.classList.add('border-zinc-200');
-          s.setAttribute('aria-pressed', 'false');
-        });
-        this.classList.add('ring-2', 'ring-offset-2', 'ring-indigo-500', 'border-indigo-500');
-        this.classList.remove('border-zinc-200');
-        this.setAttribute('aria-pressed', 'true');
-        if (colorLabel) colorLabel.textContent = this.dataset.color || '';
-      });
-    });
-
-    // ---- Lens Options ----
-    const lensOptions = document.querySelectorAll('#lens-options label');
-
-    lensOptions.forEach(function (label) {
-      label.addEventListener('click', function () {
-        lensOptions.forEach(function (l) {
-          const inner = l.querySelector('div');
-          if (inner) {
-            inner.classList.remove('border-indigo-500', 'bg-indigo-50');
-            inner.classList.add('border-zinc-200');
-          }
-        });
-        const inner = this.querySelector('div');
-        if (inner) {
-          inner.classList.add('border-indigo-500', 'bg-indigo-50');
-          inner.classList.remove('border-zinc-200');
-        }
-      });
-    });
-
-    // ---- Delivery Options ----
-    const deliveryOptions = document.querySelectorAll('.delivery-option');
-
-    deliveryOptions.forEach(function (opt) {
-      opt.addEventListener('click', function () {
-        deliveryOptions.forEach(function (d) {
-          d.classList.remove('selected');
-          d.setAttribute('aria-checked', 'false');
-        });
-        this.classList.add('selected');
-        this.setAttribute('aria-checked', 'true');
-      });
-
-      opt.addEventListener('keydown', function (e) {
-        if (e.key === 'Enter' || e.key === ' ') {
-          e.preventDefault();
-          this.click();
-        }
-      });
-    });
-
-    // ---- Upload Zone ----
-    const uploadZone = document.getElementById('upload-zone');
-    const uploadInput = document.getElementById('prescription-upload');
-
-    if (uploadZone && uploadInput) {
-      uploadZone.addEventListener('click', function () {
-        uploadInput.click();
-      });
-      uploadZone.addEventListener('keydown', function (e) {
-        if (e.key === 'Enter' || e.key === ' ') {
-          e.preventDefault();
-          uploadInput.click();
-        }
-      });
-      uploadInput.addEventListener('change', function () {
-        if (this.files && this.files[0]) {
-          uploadZone.innerHTML = '<i class="fa-solid fa-file-circle-check text-3xl text-green-500 mb-3"></i><p class="text-sm font-medium text-neutral-900">' + this.files[0].name + '</p><p class="text-xs text-gray-500 mt-1">Klik untuk ganti file</p>';
-        }
-      });
-    }
-
-    // ---- Promo Code ----
-    const promoInput   = document.getElementById('promo-code-input');
-    const applyBtn     = document.getElementById('apply-promo-btn');
-    const removeBtn    = document.getElementById('remove-promo-btn');
-    const promoFeedback = document.getElementById('promo-feedback');
-
-    if (applyBtn && promoInput) {
-      applyBtn.addEventListener('click', function () {
-        const code = (promoInput.value || '').trim().toUpperCase();
-        if (!code) return;
-
-        fetch('/api/promo/check', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
-          },
-          body: JSON.stringify({
-            code: code,
-            price: parseInt(document.querySelector('main').dataset.basePrice || '0', 10)
-          })
-        })
-        .then(function (r) { return r.json(); })
-        .then(function (data) {
-          if (promoFeedback) {
-            promoFeedback.style.display = 'block';
-            if (data.valid) {
-              promoFeedback.textContent = 'Kode promo berhasil diterapkan! Diskon: Rp ' + data.discount_amount.toLocaleString('id-ID');
-              promoFeedback.className = 'text-xs font-medium text-green-600';
-              if (removeBtn) removeBtn.style.display = 'inline-flex';
-              applyBtn.style.display = 'none';
-              const promoDiscount = document.getElementById('promo-discount');
-              if (promoDiscount) {
-                promoDiscount.textContent = 'Promo ' + code + ': -Rp ' + data.discount_amount.toLocaleString('id-ID');
-                promoDiscount.style.display = 'block';
-              }
-            } else {
-              promoFeedback.textContent = data.message || 'Kode promo tidak valid atau sudah kadaluarsa.';
-              promoFeedback.className = 'text-xs font-medium text-red-600';
-            }
-          }
-        })
-        .catch(function () {
-          if (promoFeedback) {
-            promoFeedback.style.display = 'block';
-            promoFeedback.textContent = 'Gagal memeriksa kode promo. Silakan coba lagi.';
-            promoFeedback.className = 'text-xs font-medium text-red-600';
-          }
-        });
-      });
-    }
-
-    if (removeBtn && applyBtn && promoInput && promoFeedback) {
-      removeBtn.addEventListener('click', function () {
-        promoInput.value = '';
-        promoFeedback.style.display = 'none';
-        removeBtn.style.display = 'none';
-        applyBtn.style.display = 'inline-flex';
-        const promoDiscount = document.getElementById('promo-discount');
-        if (promoDiscount) promoDiscount.style.display = 'none';
-      });
-    }
-
-    // ---- WhatsApp Order Button ----
-    const waBtn = document.getElementById('wa-order-btn');
-    if (waBtn) {
-      waBtn.addEventListener('click', function () {
-        const productName = this.dataset.productName || 'Produk';
-        const waNumber    = this.dataset.waNumber || '6281234567890';
-        const selectedColor = colorLabel ? colorLabel.textContent : 'Hitam';
-        const selectedLens  = document.querySelector('#lens-options input[type="radio"]:checked');
-        const lensName      = selectedLens ? (selectedLens.closest('label')?.querySelector('span.font-bold')?.textContent || 'Standar') : 'Standar';
-        const selectedDelivery = document.querySelector('.delivery-option.selected');
-        const deliveryName     = selectedDelivery ? (selectedDelivery.querySelector('.delivery-option-name')?.textContent || 'Ambil di Toko') : 'Ambil di Toko';
-        const priceEl = document.getElementById('product-price');
-        const price   = priceEl ? priceEl.textContent.trim() : 'N/A';
-
-        const message = [
-          'Halo IndoOptik! Saya ingin memesan:',
-          '',
-          '\uD83D\uDD76\uFE0F ' + productName + ' (' + selectedColor + ')',
-          '\uD83D\uDD0D Lensa: ' + lensName,
-          '\uD83D\uDE9A Pengiriman: ' + deliveryName,
-          '',
-          'Harga: ' + price,
-          '',
-          'Mohon konfirmasinya. Terima kasih!'
-        ].join('\n');
-
-        window.open('https://wa.me/' + waNumber + '?text=' + encodeURIComponent(message), '_blank');
-      });
-    }
-
-    // ---- Add to Cart ----
-    const cartBtn = document.getElementById('add-to-cart-btn');
-    if (cartBtn) {
-      cartBtn.addEventListener('click', function () {
-        const productId   = this.dataset.productId;
-        const productSlug = this.dataset.productSlug;
-        const selectedColor = colorLabel ? colorLabel.textContent : 'Hitam';
-        const selectedLens  = document.querySelector('#lens-options input[type="radio"]:checked');
-        const lensValue     = selectedLens ? selectedLens.value : 'standard';
-        const selectedDelivery = document.querySelector('.delivery-option.selected');
-        const deliveryValue    = selectedDelivery ? selectedDelivery.dataset.delivery : 'pickup';
-
-        // Prescription
-        const rx = {
-          r_sph:  document.querySelector('[name="rx_r_sph"]')?.value  || '',
-          r_cyl:  document.querySelector('[name="rx_r_cyl"]')?.value  || '',
-          r_axis: document.querySelector('[name="rx_r_axis"]')?.value || '',
-          l_sph:  document.querySelector('[name="rx_l_sph"]')?.value  || '',
-          l_cyl:  document.querySelector('[name="rx_l_cyl"]')?.value  || '',
-          l_axis: document.querySelector('[name="rx_l_axis"]')?.value || '',
-          pd:     document.querySelector('[name="rx_pd"]')?.value     || '',
-        };
-
-        const promoCode = promoInput ? promoInput.value.trim().toUpperCase() : '';
-
-        const originalText = cartBtn.innerHTML;
-        cartBtn.disabled = true;
-        cartBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Menambahkan...';
-
-        fetch('{{ route("cart.add") }}', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
-          },
-          body: JSON.stringify({
-            product_id:        productId,
-            color:             selectedColor,
-            lens_type:         lensValue,
-            delivery_type:     deliveryValue,
-            prescription_data: rx,
-            quantity:          1
-          })
-        })
-        .then(function (r) { return r.json(); })
-        .then(function (data) {
-          cartBtn.innerHTML = '<i class="fa-solid fa-check text-green-500"></i> Ditambahkan!';
-          setTimeout(function () {
-            cartBtn.disabled = false;
-            cartBtn.innerHTML = originalText;
-          }, 2000);
-
-          // Update cart badge
-          const badge = document.getElementById('cart-badge');
-          if (badge && data.cart_count > 0) {
-            badge.textContent = data.cart_count;
-            badge.style.display = 'flex';
-          }
-        })
-        .catch(function () {
-          cartBtn.disabled = false;
-          cartBtn.innerHTML = originalText;
-          alert('Gagal menambahkan ke keranjang. Silakan coba lagi.');
-        });
-      });
-    }
-
-    // ---- Thumbnail click handler ----
-    const thumbContainer = document.getElementById('thumb-container');
-    if (thumbContainer) {
-      thumbContainer.querySelectorAll('button, div[class*="aspect"]').forEach(function (el) {
-        el.style.cursor = 'pointer';
-        el.addEventListener('click', function () {
-          const img = this.querySelector('img');
-          const mainImg = document.getElementById('main-product-img');
-          if (img && mainImg) {
-            mainImg.src = img.src;
-          }
-          thumbContainer.querySelectorAll('button, div[class*="aspect"]').forEach(function (t) {
-            t.classList.remove('ring-2', 'ring-indigo-500', 'border-indigo-400');
-          });
-          this.classList.add('ring-2', 'ring-indigo-500');
-        });
-      });
-    }
-
-  });
-})();
+<script type="application/json" id="product-color-variants">
+{!! json_encode($colorVariantList) !!}
 </script>
-@endpush
+<script type="application/json" id="product-lens-variants">
+{!! json_encode($lensVariantList) !!}
+</script>
+<script type="application/json" id="product-gallery-images">
+{!! json_encode($galleryImages) !!}
+</script>
 
 @endsection

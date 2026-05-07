@@ -369,7 +369,7 @@ window.showToast = function (
 /* =========================================
    IndoOptik — Product Page
    ========================================= */
-const COLOR_VARIANTS = {
+const DEFAULT_COLOR_VARIANTS = {
     hitam: {
         label: "Hitam",
         color: "#1a1a1a",
@@ -412,7 +412,7 @@ const COLOR_VARIANTS = {
     },
 };
 
-const LENS_VARIANTS = {
+const DEFAULT_LENS_VARIANTS = {
     standard: {
         label: "Standar",
         desc: "Lensa bening standar",
@@ -443,6 +443,74 @@ function formatIDR(n) {
     return "Rp " + Math.round(n).toLocaleString("id-ID");
 }
 
+function readJsonFromElement(id) {
+    const el = document.getElementById(id);
+    if (!el) return null;
+    try {
+        return JSON.parse(el.textContent || "null");
+    } catch (e) {
+        return null;
+    }
+}
+
+function slugifyKey(value) {
+    return String(value || "")
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/(^-|-$)/g, "");
+}
+
+function normalizeColorVariants(input, fallbackImages) {
+    const imagesFallback = Array.isArray(fallbackImages)
+        ? fallbackImages.filter(Boolean)
+        : [];
+    const base = input || DEFAULT_COLOR_VARIANTS;
+
+    if (Array.isArray(base)) {
+        const out = {};
+        base.forEach((variant, index) => {
+            const key =
+                variant?.key ||
+                slugifyKey(variant?.label) ||
+                `color-${index + 1}`;
+            const images = Array.isArray(variant?.images)
+                ? variant.images.filter(Boolean)
+                : imagesFallback;
+            out[key] = {
+                label: variant?.label || `Warna ${index + 1}`,
+                color: variant?.color || "#111827",
+                images: images.length ? images : imagesFallback,
+            };
+        });
+        return Object.keys(out).length ? out : DEFAULT_COLOR_VARIANTS;
+    }
+
+    return typeof base === "object" && base ? base : DEFAULT_COLOR_VARIANTS;
+}
+
+function normalizeLensVariants(input) {
+    const base = input || DEFAULT_LENS_VARIANTS;
+
+    if (Array.isArray(base)) {
+        const out = {};
+        base.forEach((variant, index) => {
+            const key =
+                variant?.key ||
+                slugifyKey(variant?.label) ||
+                `lens-${index + 1}`;
+            out[key] = {
+                label: variant?.label || `Lensa ${index + 1}`,
+                desc: variant?.desc || "",
+                priceAddon: Number(variant?.priceAddon ?? variant?.price ?? 0),
+                icon: variant?.icon || "fa-solid fa-eye",
+            };
+        });
+        return Object.keys(out).length ? out : DEFAULT_LENS_VARIANTS;
+    }
+
+    return typeof base === "object" && base ? base : DEFAULT_LENS_VARIANTS;
+}
+
 function initProductPage() {
     const mainImg = document.getElementById("main-product-img");
     const colorContainer = document.getElementById("color-swatches");
@@ -458,6 +526,22 @@ function initProductPage() {
 
     if (!mainImg) return;
 
+    const galleryImages = readJsonFromElement("product-gallery-images") || [];
+    if (galleryImages.length === 0 && mainImg.src) {
+        galleryImages.push(mainImg.src);
+    }
+
+    const colorVariants = normalizeColorVariants(
+        readJsonFromElement("product-color-variants"),
+        galleryImages,
+    );
+    const lensVariants = normalizeLensVariants(
+        readJsonFromElement("product-lens-variants"),
+    );
+
+    const colorKeys = Object.keys(colorVariants);
+    const lensKeys = Object.keys(lensVariants);
+
     // Read base price from data attribute or default
     const BASE_PRICE = parseInt(
         mainImg.closest("main")?.dataset.basePrice || "299000",
@@ -470,8 +554,8 @@ function initProductPage() {
 
     // Product state
     let state = {
-        selectedColor: "hitam",
-        selectedLens: "standard",
+        selectedColor: colorKeys[0] || "hitam",
+        selectedLens: lensKeys[0] || "standard",
         selectedThumb: 0,
         delivery: "pickup",
         appliedPromo: null,
@@ -482,9 +566,9 @@ function initProductPage() {
         const saved = JSON.parse(
             localStorage.getItem("indooptik_product_state") || "{}",
         );
-        if (saved.selectedColor && COLOR_VARIANTS[saved.selectedColor])
+        if (saved.selectedColor && colorVariants[saved.selectedColor])
             state.selectedColor = saved.selectedColor;
-        if (saved.selectedLens && LENS_VARIANTS[saved.selectedLens])
+        if (saved.selectedLens && lensVariants[saved.selectedLens])
             state.selectedLens = saved.selectedLens;
     } catch (e) {
         /* ignore */
@@ -517,7 +601,9 @@ function initProductPage() {
 
     function renderThumbnails() {
         if (!thumbContainer) return;
-        const images = COLOR_VARIANTS[state.selectedColor].images;
+        const images = colorVariants[state.selectedColor]?.images?.length
+            ? colorVariants[state.selectedColor].images
+            : galleryImages;
         thumbContainer.innerHTML = images
             .map(
                 (src, i) => `
@@ -542,7 +628,7 @@ function initProductPage() {
 
     function renderColorSwatches() {
         if (!colorContainer) return;
-        colorContainer.innerHTML = Object.entries(COLOR_VARIANTS)
+        colorContainer.innerHTML = Object.entries(colorVariants)
             .map(
                 ([key, v]) => `
             <button
@@ -557,7 +643,9 @@ function initProductPage() {
             .join("");
 
         const lbl = document.getElementById("selected-color-label");
-        if (lbl) lbl.textContent = COLOR_VARIANTS[state.selectedColor].label;
+        if (lbl && colorVariants[state.selectedColor]) {
+            lbl.textContent = colorVariants[state.selectedColor].label;
+        }
 
         colorContainer.querySelectorAll("[data-color]").forEach((btn) => {
             btn.addEventListener("click", () => {
@@ -566,18 +654,22 @@ function initProductPage() {
                 saveState();
                 renderColorSwatches();
                 renderThumbnails();
-                updateMainImage(COLOR_VARIANTS[state.selectedColor].images[0]);
+                const nextImages = colorVariants[state.selectedColor]?.images
+                    ?.length
+                    ? colorVariants[state.selectedColor].images
+                    : galleryImages;
+                updateMainImage(nextImages[0] || mainImg.src);
             });
         });
     }
 
     function renderLensOptions() {
         if (!lensContainer) return;
-        lensContainer.innerHTML = Object.entries(LENS_VARIANTS)
+        lensContainer.innerHTML = Object.entries(lensVariants)
             .map(
                 ([key, v]) => `
             <label class="lens-option ${state.selectedLens === key ? "selected" : ""}" data-lens="${key}">
-                <input type="radio" name="lens" value="${key}" ${state.selectedLens === key ? "checked" : ""} />
+                <input type="radio" name="lens_type" value="${key}" ${state.selectedLens === key ? "checked" : ""} />
                 <span class="lens-option-icon"><i class="${v.icon}"></i></span>
                 <span class="lens-option-body">
                     <span class="lens-option-name">${v.label}</span>
@@ -600,7 +692,7 @@ function initProductPage() {
     }
 
     function getPricingSummary() {
-        const lensAddon = LENS_VARIANTS[state.selectedLens]?.priceAddon || 0;
+        const lensAddon = lensVariants[state.selectedLens]?.priceAddon || 0;
         const subtotal = BASE_PRICE + lensAddon;
         let promoDiscount = 0;
         if (state.appliedPromo) {
@@ -771,10 +863,10 @@ function initProductPage() {
         addToCartBtn.addEventListener("click", () => {
             const pricing = getPricingSummary();
             const color =
-                COLOR_VARIANTS[state.selectedColor]?.label ||
+                colorVariants[state.selectedColor]?.label ||
                 state.selectedColor;
             const lens =
-                LENS_VARIANTS[state.selectedLens]?.label || state.selectedLens;
+                lensVariants[state.selectedLens]?.label || state.selectedLens;
 
             try {
                 localStorage.setItem("indooptik_cart_qty", "1");
@@ -817,10 +909,10 @@ function initProductPage() {
     if (waBtn) {
         waBtn.addEventListener("click", () => {
             const color =
-                COLOR_VARIANTS[state.selectedColor]?.label ||
+                colorVariants[state.selectedColor]?.label ||
                 state.selectedColor;
             const lens =
-                LENS_VARIANTS[state.selectedLens]?.label || state.selectedLens;
+                lensVariants[state.selectedLens]?.label || state.selectedLens;
             const delivery =
                 state.delivery === "pickup"
                     ? "Ambil di Toko"
@@ -872,7 +964,10 @@ function initProductPage() {
     renderColorSwatches();
     renderThumbnails();
     renderLensOptions();
-    updateMainImage(COLOR_VARIANTS[state.selectedColor].images[0]);
+    const initialImages = colorVariants[state.selectedColor]?.images?.length
+        ? colorVariants[state.selectedColor].images
+        : galleryImages;
+    updateMainImage(initialImages[0] || mainImg.src);
     updatePrice();
     refreshPromoUI();
 }

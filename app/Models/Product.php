@@ -27,6 +27,8 @@ class Product extends Model
         'is_featured',
         'meta_title',
         'meta_description',
+        'color_variants',
+        'lens_variants',
     ];
 
     protected $appends = [
@@ -41,6 +43,8 @@ class Product extends Model
             'discount_price' => 'integer',
             'stock'          => 'integer',
             'is_featured'    => 'boolean',
+            'color_variants' => 'array',
+            'lens_variants'  => 'array',
         ];
     }
 
@@ -112,8 +116,8 @@ class Product extends Model
     {
         $path = $this->image ?? $this->photo;
         if (!$path) return null;
-        return \Illuminate\Support\Str::startsWith($path, ['http://', 'https://']) 
-            ? $path 
+        return \Illuminate\Support\Str::startsWith($path, ['http://', 'https://'])
+            ? $path
             : asset('storage/' . $path);
     }
 
