@@ -12,12 +12,24 @@ fi
 export RUN_MIGRATIONS="${RUN_MIGRATIONS:-true}"
 export RUN_SEEDERS="${RUN_SEEDERS:-false}"
 
+if docker compose version >/dev/null 2>&1; then
+  COMPOSE_CMD="docker compose"
+else
+  COMPOSE_CMD="docker-compose"
+fi
+
 echo "==> Building and starting containers"
-docker-compose up -d --build
+# Legacy docker-compose sometimes fails to recreate containers with newer images.
+# Recreate only the app container (keeps DB volume intact).
+if [[ "${FORCE_RECREATE_APP:-1}" == "1" ]]; then
+  $COMPOSE_CMD rm -sf app || true
+fi
+
+$COMPOSE_CMD up -d --build
 
 echo "==> Optimizing caches"
-docker-compose exec -T app php artisan config:cache --no-interaction || true
-docker-compose exec -T app php artisan route:cache --no-interaction || true
-docker-compose exec -T app php artisan view:cache --no-interaction || true
+$COMPOSE_CMD exec -T app php artisan config:cache --no-interaction || true
+$COMPOSE_CMD exec -T app php artisan route:cache --no-interaction || true
+$COMPOSE_CMD exec -T app php artisan view:cache --no-interaction || true
 
 echo "==> Done"
