@@ -6,7 +6,7 @@
 @section('content')
 <div class="bg-gradient-to-br from-indigo-50 via-violet-50 to-white py-16 px-4 sm:px-6 lg:px-8 flex flex-col justify-center items-center relative min-h-[calc(100vh-80px-300px)] lg:min-h-[calc(100vh-80px-300px)] h-full overflow-hidden w-full">
     <div class="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0Ij48Y2lyY2xlIGN4PSIyIiBjeT0iMiIgcj0iMiIgZmlsbD0iIzYzNjZmMSIgZmlsbC1vcGFjaXR5PSIwLjA1Ii8+PC9zdmc+')] opacity-60"></div>
-  
+
   <div class="w-full max-w-md relative z-10 mx-auto my-auto" data-animate="scale-up">
 
     <!-- Card -->
@@ -23,7 +23,7 @@
             {{ session('status') }}
         </div>
       @endif
-      
+
       @if ($errors->any())
         <div class="mb-4 font-medium text-sm text-red-600 bg-red-50 px-4 py-3 rounded-xl border border-red-200">
             <ul class="list-disc list-inside">
@@ -36,7 +36,7 @@
 
       <form action="{{ route('login') }}" method="POST" class="space-y-5" id="login-form">
         @csrf
-        
+
         <!-- Email -->
         <div>
           <label for="email" class="block text-sm font-bold text-neutral-900 mb-2">Email</label>
@@ -115,11 +115,13 @@
         Lanjutkan dengan Google
       </button>
 
-      <!-- Register link -->
-      <p class="text-center text-sm text-gray-500 mt-8 font-medium">
-        Belum punya akun?
-        <a href="{{ route('register') }}" class="text-indigo-600 font-bold hover:text-indigo-800 hover:underline transition ml-1">Daftar Sekarang</a>
-      </p>
+      @guest
+        <!-- Register link -->
+        <p class="text-center text-sm text-gray-500 mt-8 font-medium">
+          Belum punya akun?
+          <a href="{{ route('register') }}" class="text-indigo-600 font-bold hover:text-indigo-800 hover:underline transition ml-1">Daftar Sekarang</a>
+        </p>
+      @endguest
     </div>
   </div>
 </div>

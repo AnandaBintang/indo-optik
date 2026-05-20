@@ -192,7 +192,7 @@
       <a href="{{ route('catalog.index') }}" class="btn btn-xl bg-white text-indigo-600 shadow-xl border border-white hover:bg-neutral-50 font-bold">
         Jelajahi Katalog <i class="fa-solid fa-arrow-right"></i>
       </a>
-      <a href="{{ route('services.index') }}" class="btn btn-xl bg-white/10 text-white font-semibold border border-white/30 backdrop-blur-md hover:bg-white/20">
+      <a href="{{ route('services.index') }}" class="btn btn-xl bg-white/25 text-white font-semibold border border-white/60 shadow-lg shadow-indigo-900/20 backdrop-blur-md hover:bg-white/35">
         <i class="fa-solid fa-calendar-check"></i>
         Buat Janji Temu
       </a>

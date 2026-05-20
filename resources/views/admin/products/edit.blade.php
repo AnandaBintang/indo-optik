@@ -30,26 +30,33 @@
             <input type="text" id="name" name="name" value="{{ old('name', $product->name) }}" required
               class="w-full bg-neutral-50 rounded-xl py-3 px-4 text-sm font-medium focus:ring-2 focus:ring-indigo-500 border border-zinc-200">
             @error('name') <p class="text-red-500 text-xs mt-1.5">{{ $message }}</p> @enderror
-          </div>
-
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
-            <div>
-              <label for="category_id" class="block text-sm font-bold text-neutral-900 mb-2">Kategori <span class="text-red-500">*</span></label>
-              <select id="category_id" name="category_id" required class="w-full bg-neutral-50 rounded-xl py-3 px-4 text-sm font-medium focus:ring-2 focus:ring-indigo-500 border border-zinc-200">
-                <option value="">Pilih Kategori</option>
-                @foreach($categories as $cat)
-                  <option value="{{ $cat->id }}" {{ old('category_id', $product->category_id) == $cat->id ? 'selected' : '' }}>{{ $cat->name }}</option>
-                @endforeach
-              </select>
-              @error('category_id') <p class="text-red-500 text-xs mt-1.5">{{ $message }}</p> @enderror
-            </div>
-
-            <div>
-              <label for="sku" class="block text-sm font-bold text-neutral-900 mb-2">SKU (Kode Barang)</label>
-              <input type="text" id="sku" name="sku" value="{{ old('sku', $product->sku) }}"
-                class="w-full bg-neutral-50 rounded-xl py-3 px-4 text-sm font-medium focus:ring-2 focus:ring-indigo-500 border border-zinc-200 uppercase">
-              @error('sku') <p class="text-red-500 text-xs mt-1.5">{{ $message }}</p> @enderror
-            </div>
+          @php
+            $colorVariants = old('color_variants', $product->color_variants ?? []);
+            $lensVariants = old('lens_variants', $product->lens_variants ?? []);
+            $lensIconOptions = [
+              'fa-solid fa-eye' => 'Eye',
+              'fa-solid fa-display' => 'Display',
+              'fa-solid fa-shield-halved' => 'Shield',
+              'fa-solid fa-sun' => 'Sun',
+              'fa-solid fa-glasses' => 'Glasses',
+            ];
+            if (!is_array($colorVariants) || count($colorVariants) === 0) {
+              $colorVariants = [
+                ['key' => '', 'label' => '', 'color' => '#111827', 'images' => ''],
+              ];
+            }
+            if (!is_array($lensVariants) || count($lensVariants) === 0) {
+              $lensVariants = [
+                [
+                  'key' => 'standard',
+                  'label' => 'Standar',
+                  'desc' => 'Lensa bening standar',
+                  'price' => 0,
+                  'icon' => 'fa-solid fa-eye',
+                ],
+              ];
+            }
+          @endphp
           </div>
 
           <div>
@@ -121,15 +128,25 @@
                       <input type="text" name="color_variants[{{ $index }}][label]" value="{{ $variant['label'] ?? '' }}"
                         class="w-full bg-neutral-50 rounded-xl py-2.5 px-3 text-xs font-medium border border-zinc-200" placeholder="Hitam">
                     </div>
-                    <div class="md:col-span-2">
-                      <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Warna</label>
-                      <input type="color" name="color_variants[{{ $index }}][color]" value="{{ $variant['color'] ?? '#111827' }}"
-                        class="w-full h-11 rounded-xl border border-zinc-200 bg-white">
+                    <div class="md:col-span-4">
+                      <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Gambar (URL atau upload)</label>
+                      <div class="space-y-2">
+                        <input type="text" name="color_variants[{{ $index }}][images]" value="{{ $imagesValue }}"
+                          class="w-full bg-neutral-50 rounded-xl py-2.5 px-3 text-xs font-medium border border-zinc-200" placeholder="url1, url2">
+                        <input type="file" name="color_variants[{{ $index }}][image_uploads][]" accept="image/*" multiple
+                          class="w-full bg-white rounded-xl py-2 px-3 text-xs font-medium border border-zinc-200">
+                      </div>
                     </div>
-                    <div class="md:col-span-3">
-                      <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Gambar (URL)</label>
-                      <input type="text" name="color_variants[{{ $index }}][images]" value="{{ $imagesValue }}"
-                        class="w-full bg-neutral-50 rounded-xl py-2.5 px-3 text-xs font-medium border border-zinc-200" placeholder="url1, url2 (pisahkan koma)">
+                    <div class="md:col-span-1">
+                      <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Ikon</label>
+                      <select name="lens_variants[{{ $index }}][icon]"
+                        class="w-full bg-neutral-50 rounded-xl py-2.5 px-3 text-xs font-medium border border-zinc-200">
+                        @foreach($lensIconOptions as $iconClass => $iconLabel)
+                          <option value="{{ $iconClass }}" {{ ($variant['icon'] ?? 'fa-solid fa-eye') === $iconClass ? 'selected' : '' }}>
+                            {{ $iconLabel }}
+                          </option>
+                        @endforeach
+                      </select>
                     </div>
                     <div class="md:col-span-2">
                       <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Upload Gambar</label>
@@ -383,15 +400,25 @@
       <input type="text" name="color_variants[__INDEX__][label]"
         class="w-full bg-neutral-50 rounded-xl py-2.5 px-3 text-xs font-medium border border-zinc-200" placeholder="Hitam">
     </div>
-    <div class="md:col-span-2">
-      <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Warna</label>
-      <input type="color" name="color_variants[__INDEX__][color]" value="#111827"
-        class="w-full h-11 rounded-xl border border-zinc-200 bg-white">
+    <div class="md:col-span-4">
+      <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Gambar (URL atau upload)</label>
+      <div class="space-y-2">
+        <input type="text" name="color_variants[__INDEX__][images]"
+          class="w-full bg-neutral-50 rounded-xl py-2.5 px-3 text-xs font-medium border border-zinc-200" placeholder="url1, url2">
+        <input type="file" name="color_variants[__INDEX__][image_uploads][]" accept="image/*" multiple
+          class="w-full bg-white rounded-xl py-2 px-3 text-xs font-medium border border-zinc-200">
+      </div>
     </div>
-    <div class="md:col-span-3">
-      <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Gambar (URL)</label>
-      <input type="text" name="color_variants[__INDEX__][images]"
-        class="w-full bg-neutral-50 rounded-xl py-2.5 px-3 text-xs font-medium border border-zinc-200" placeholder="url1, url2 (pisahkan koma)">
+    <div class="md:col-span-1">
+      <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Ikon</label>
+      <select name="lens_variants[__INDEX__][icon]"
+        class="w-full bg-neutral-50 rounded-xl py-2.5 px-3 text-xs font-medium border border-zinc-200">
+        @foreach($lensIconOptions as $iconClass => $iconLabel)
+          <option value="{{ $iconClass }}" {{ $iconClass === 'fa-solid fa-eye' ? 'selected' : '' }}>
+            {{ $iconLabel }}
+          </option>
+        @endforeach
+      </select>
     </div>
     <div class="md:col-span-2">
       <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Upload Gambar</label>

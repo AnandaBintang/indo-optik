@@ -76,19 +76,21 @@
 {{-- ============================================================
      PROMO BANNER
      ============================================================ --}}
-<div class="bg-gradient-to-r from-indigo-600 to-indigo-500 py-4">
-  <div class="page-shell flex flex-col sm:flex-row justify-between items-center gap-4 text-center sm:text-left">
-    <div class="flex flex-col sm:flex-row items-center gap-3">
-      <span class="bg-white/20 text-white px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider flex items-center gap-1.5">
-        <i class="fa-solid fa-tag"></i> Promo Terbatas
-      </span>
-      <p class="text-white text-base font-medium">Daftar sekarang dan dapatkan diskon hingga 30% untuk pengguna baru!</p>
+@guest
+  <div class="bg-gradient-to-r from-indigo-600 to-indigo-500 py-4">
+    <div class="page-shell flex flex-col sm:flex-row justify-between items-center gap-4 text-center sm:text-left">
+      <div class="flex flex-col sm:flex-row items-center gap-3">
+        <span class="bg-white/20 text-white px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider flex items-center gap-1.5">
+          <i class="fa-solid fa-tag"></i> Promo Terbatas
+        </span>
+        <p class="text-white text-base font-medium">Daftar sekarang dan dapatkan diskon hingga 30% untuk pengguna baru!</p>
+      </div>
+      <a href="{{ route('register') }}" class="btn btn-sm bg-white text-indigo-600 font-bold hover:bg-neutral-50 hover:-translate-y-px">
+        Daftar Sekarang
+      </a>
     </div>
-    <a href="{{ route('register') }}" class="btn btn-sm bg-white text-indigo-600 font-bold hover:bg-neutral-50 hover:-translate-y-px">
-      Daftar Sekarang
-    </a>
   </div>
-</div>
+@endguest
 
 {{-- ============================================================
      KATEGORI

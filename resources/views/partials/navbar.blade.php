@@ -80,8 +80,8 @@
             </button>
 
             {{-- Dropdown --}}
-            <div id="user-dropdown-menu"
-                 class="absolute right-0 mt-2 w-52 bg-white rounded-2xl shadow-xl shadow-neutral-200/80 border border-zinc-100 py-2 z-50"
+              <div id="user-dropdown-menu"
+                class="absolute right-0 mt-2 w-52 bg-white rounded-2xl shadow-xl shadow-neutral-200/80 border border-zinc-100 py-2 z-50 overflow-hidden"
                  style="display:none;">
 
               <div class="px-4 py-2.5 border-b border-zinc-100 mb-1">
