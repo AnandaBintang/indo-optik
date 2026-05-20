@@ -13,11 +13,11 @@ export RUN_MIGRATIONS="${RUN_MIGRATIONS:-true}"
 export RUN_SEEDERS="${RUN_SEEDERS:-false}"
 
 echo "==> Building and starting containers"
-docker compose up -d --build
+docker-compose up -d --build
 
 echo "==> Optimizing caches"
-docker compose exec -T app php artisan config:cache --no-interaction || true
-docker compose exec -T app php artisan route:cache --no-interaction || true
-docker compose exec -T app php artisan view:cache --no-interaction || true
+docker-compose exec -T app php artisan config:cache --no-interaction || true
+docker-compose exec -T app php artisan route:cache --no-interaction || true
+docker-compose exec -T app php artisan view:cache --no-interaction || true
 
 echo "==> Done"
