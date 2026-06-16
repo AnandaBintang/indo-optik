@@ -439,6 +439,27 @@ const DEFAULT_LENS_VARIANTS = {
     },
 };
 
+const DEFAULT_FRAME_VARIANTS = {
+    "full-rim": {
+        label: "Full Rim",
+        desc: "Frame penuh klasik",
+        priceAddon: 0,
+        icon: "fa-solid fa-glasses",
+    },
+    "half-rim": {
+        label: "Half Rim",
+        desc: "Ringan dengan bagian bawah terbuka",
+        priceAddon: 50000,
+        icon: "fa-regular fa-circle",
+    },
+    rimless: {
+        label: "Rimless",
+        desc: "Minimalis tanpa bingkai penuh",
+        priceAddon: 100000,
+        icon: "fa-solid fa-feather",
+    },
+};
+
 function formatIDR(n) {
     return "Rp " + Math.round(n).toLocaleString("id-ID");
 }
@@ -511,10 +532,34 @@ function normalizeLensVariants(input) {
     return typeof base === "object" && base ? base : DEFAULT_LENS_VARIANTS;
 }
 
+function normalizeFrameVariants(input) {
+    const base = input || DEFAULT_FRAME_VARIANTS;
+
+    if (Array.isArray(base)) {
+        const out = {};
+        base.forEach((variant, index) => {
+            const key =
+                variant?.key ||
+                slugifyKey(variant?.label) ||
+                `frame-${index + 1}`;
+            out[key] = {
+                label: variant?.label || `Frame ${index + 1}`,
+                desc: variant?.desc || "",
+                priceAddon: Number(variant?.priceAddon ?? variant?.price ?? 0),
+                icon: variant?.icon || "fa-solid fa-glasses",
+            };
+        });
+        return Object.keys(out).length ? out : DEFAULT_FRAME_VARIANTS;
+    }
+
+    return typeof base === "object" && base ? base : DEFAULT_FRAME_VARIANTS;
+}
+
 function initProductPage() {
     const mainImg = document.getElementById("main-product-img");
     const colorContainer = document.getElementById("color-swatches");
     const thumbContainer = document.getElementById("thumb-container");
+    const frameContainer = document.getElementById("frame-options");
     const lensContainer = document.getElementById("lens-options");
     const priceEl = document.getElementById("product-price");
     const priceAddonEl = document.getElementById("price-addon");
@@ -538,9 +583,13 @@ function initProductPage() {
     const lensVariants = normalizeLensVariants(
         readJsonFromElement("product-lens-variants"),
     );
+    const frameVariants = normalizeFrameVariants(
+        readJsonFromElement("product-frame-variants"),
+    );
 
     const colorKeys = Object.keys(colorVariants);
     const lensKeys = Object.keys(lensVariants);
+    const frameKeys = Object.keys(frameVariants);
 
     // Read base price from data attribute or default
     const BASE_PRICE = parseInt(
@@ -555,6 +604,7 @@ function initProductPage() {
     // Product state
     let state = {
         selectedColor: colorKeys[0] || "hitam",
+        selectedFrame: frameKeys[0] || "full-rim",
         selectedLens: lensKeys[0] || "standard",
         selectedThumb: 0,
         delivery: "pickup",
@@ -568,6 +618,8 @@ function initProductPage() {
         );
         if (saved.selectedColor && colorVariants[saved.selectedColor])
             state.selectedColor = saved.selectedColor;
+        if (saved.selectedFrame && frameVariants[saved.selectedFrame])
+            state.selectedFrame = saved.selectedFrame;
         if (saved.selectedLens && lensVariants[saved.selectedLens])
             state.selectedLens = saved.selectedLens;
     } catch (e) {
@@ -580,6 +632,7 @@ function initProductPage() {
                 "indooptik_product_state",
                 JSON.stringify({
                     selectedColor: state.selectedColor,
+                    selectedFrame: state.selectedFrame,
                     selectedLens: state.selectedLens,
                 }),
             );
@@ -691,9 +744,43 @@ function initProductPage() {
         });
     }
 
+    function renderFrameOptions() {
+        if (!frameContainer) return;
+        frameContainer.innerHTML = Object.entries(frameVariants)
+            .map(
+                ([key, v]) => `
+            <label class="lens-option ${state.selectedFrame === key ? "selected" : ""}" data-frame="${key}">
+                <input type="radio" name="frame_type" value="${key}" ${state.selectedFrame === key ? "checked" : ""} />
+                <span class="lens-option-icon"><i class="${v.icon}"></i></span>
+                <span class="lens-option-body">
+                    <span class="lens-option-name">${v.label}</span>
+                    <span class="lens-option-desc">${v.desc}</span>
+                </span>
+                ${v.priceAddon > 0 ? `<span class="lens-option-price">+${formatIDR(v.priceAddon)}</span>` : ""}
+            </label>
+        `,
+            )
+            .join("");
+
+        const lbl = document.getElementById("selected-frame-label");
+        if (lbl && frameVariants[state.selectedFrame]) {
+            lbl.textContent = frameVariants[state.selectedFrame].label;
+        }
+
+        frameContainer.querySelectorAll("[data-frame]").forEach((opt) => {
+            opt.addEventListener("click", () => {
+                state.selectedFrame = opt.getAttribute("data-frame");
+                saveState();
+                renderFrameOptions();
+                updatePrice();
+            });
+        });
+    }
+
     function getPricingSummary() {
+        const frameAddon = frameVariants[state.selectedFrame]?.priceAddon || 0;
         const lensAddon = lensVariants[state.selectedLens]?.priceAddon || 0;
-        const subtotal = BASE_PRICE + lensAddon;
+        const subtotal = BASE_PRICE + frameAddon + lensAddon;
         let promoDiscount = 0;
         if (state.appliedPromo) {
             if (state.appliedPromo.type === "percentage") {
@@ -712,7 +799,7 @@ function initProductPage() {
             ORIG_PRICE > BASE_PRICE
                 ? Math.round(((ORIG_PRICE - total) / ORIG_PRICE) * 100)
                 : 0;
-        return { lensAddon, subtotal, promoDiscount, total, discountPercent };
+        return { frameAddon, lensAddon, subtotal, promoDiscount, total, discountPercent };
     }
 
     function updatePrice() {
@@ -720,9 +807,9 @@ function initProductPage() {
 
         if (priceEl) priceEl.textContent = formatIDR(pricing.total);
         if (priceAddonEl) {
-            if (pricing.lensAddon > 0) {
+            if (pricing.frameAddon > 0 || pricing.lensAddon > 0) {
                 priceAddonEl.style.display = "";
-                priceAddonEl.innerHTML = `Frame: ${formatIDR(BASE_PRICE)} + Lensa: <span>${formatIDR(pricing.lensAddon)}</span>`;
+                priceAddonEl.innerHTML = `Produk: ${formatIDR(BASE_PRICE)} + Tipe Frame: <span>${formatIDR(pricing.frameAddon)}</span> + Lensa: <span>${formatIDR(pricing.lensAddon)}</span>`;
             } else {
                 priceAddonEl.style.display = "none";
             }
@@ -865,6 +952,9 @@ function initProductPage() {
             const color =
                 colorVariants[state.selectedColor]?.label ||
                 state.selectedColor;
+            const frame =
+                frameVariants[state.selectedFrame]?.label ||
+                state.selectedFrame;
             const lens =
                 lensVariants[state.selectedLens]?.label || state.selectedLens;
 
@@ -877,6 +967,7 @@ function initProductPage() {
                             document.querySelector("h1")?.textContent?.trim() ||
                             "Produk",
                         color,
+                        frame,
                         lens,
                         delivery: state.delivery,
                         total: pricing.total,
@@ -896,8 +987,41 @@ function initProductPage() {
             showToast(
                 "success",
                 "Ditambahkan!",
-                `${color} + Lensa ${lens} berhasil masuk keranjang.`,
+                `${frame} + ${color} + Lensa ${lens} berhasil masuk keranjang.`,
             );
+
+            const cartUrl = addToCartBtn.dataset.cartUrl;
+            const productId = addToCartBtn.dataset.productId;
+            const csrf = document.querySelector('meta[name="csrf-token"]')?.content;
+            if (cartUrl && productId && csrf) {
+                fetch(cartUrl, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Accept": "application/json",
+                        "X-CSRF-TOKEN": csrf,
+                    },
+                    body: JSON.stringify({
+                        product_id: productId,
+                        color,
+                        frame_type: frame,
+                        frame_price: pricing.frameAddon,
+                        lens_type: lens,
+                        lens_price: pricing.lensAddon,
+                        quantity: 1,
+                        delivery_type: state.delivery,
+                    }),
+                })
+                    .then((response) => response.ok ? response.json() : Promise.reject(response))
+                    .then((data) => {
+                        if (badge && data.cart_count) {
+                            badge.textContent = String(data.cart_count);
+                        }
+                    })
+                    .catch(() => {
+                        showToast("error", "Gagal", "Produk belum tersimpan ke keranjang server.");
+                    });
+            }
         });
     }
 
@@ -911,6 +1035,9 @@ function initProductPage() {
             const color =
                 colorVariants[state.selectedColor]?.label ||
                 state.selectedColor;
+            const frame =
+                frameVariants[state.selectedFrame]?.label ||
+                state.selectedFrame;
             const lens =
                 lensVariants[state.selectedLens]?.label || state.selectedLens;
             const delivery =
@@ -924,7 +1051,7 @@ function initProductPage() {
                 ? `\n🏷️ Promo: ${state.appliedPromo.code} (-${formatIDR(pricing.promoDiscount)})`
                 : "";
 
-            const msg = `Halo IndoOptik! Saya ingin memesan:\n\n🕶️ ${productName}\n🎨 Warna: ${color}\n🔍 Lensa: ${lens}\n📦 Pengiriman: ${delivery}${promoLine}\n\n💰 Total: ${formatIDR(pricing.total)}\n\nMohon konfirmasinya. Terima kasih!`;
+            const msg = `Halo IndoOptik! Saya ingin memesan:\n\n🕶️ ${productName}\n🧩 Frame: ${frame}\n🎨 Warna: ${color}\n🔍 Lensa: ${lens}\n📦 Pengiriman: ${delivery}${promoLine}\n\n💰 Total: ${formatIDR(pricing.total)}\n\nMohon konfirmasinya. Terima kasih!`;
             window.open(
                 `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(msg)}`,
                 "_blank",
@@ -963,6 +1090,7 @@ function initProductPage() {
     // Initialize
     renderColorSwatches();
     renderThumbnails();
+    renderFrameOptions();
     renderLensOptions();
     const initialImages = colorVariants[state.selectedColor]?.images?.length
         ? colorVariants[state.selectedColor].images

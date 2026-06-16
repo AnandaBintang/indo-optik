@@ -19,8 +19,9 @@ class CartService
      * Add an item to the session cart.
      *
      * Expected item keys:
-     *   product_id, product_name, product_price, lens_type, lens_price,
-     *   color, quantity, delivery_type, image, prescription_data
+     *   product_id, product_name, product_price, frame_type, frame_price,
+     *   lens_type, lens_price, color, quantity, delivery_type, image,
+     *   prescription_data
      */
     public function add(array $item): void
     {
@@ -39,6 +40,8 @@ class CartService
                 'product_id'        => $item['product_id'],
                 'product_name'      => $item['product_name'],
                 'product_price'     => (int) $item['product_price'],
+                'frame_type'        => $item['frame_type']        ?? 'Standar',
+                'frame_price'       => (int) ($item['frame_price'] ?? 0),
                 'lens_type'         => $item['lens_type']         ?? 'Standar',
                 'lens_price'        => (int) ($item['lens_price'] ?? 0),
                 'color'             => $item['color']             ?? 'Hitam',
@@ -117,14 +120,18 @@ class CartService
     }
 
     /**
-     * Return the subtotal (sum of (product_price + lens_price) * quantity).
+     * Return the subtotal (sum of (product_price + frame_price + lens_price) * quantity).
      */
     public function getSubtotal(): int
     {
         $subtotal = 0;
 
         foreach ($this->getItems() as $item) {
-            $subtotal += ((int) $item['product_price'] + (int) $item['lens_price']) * (int) $item['quantity'];
+            $subtotal += (
+                (int) $item['product_price']
+                + (int) ($item['frame_price'] ?? 0)
+                + (int) $item['lens_price']
+            ) * (int) $item['quantity'];
         }
 
         return $subtotal;
@@ -157,13 +164,19 @@ class CartService
 
         $no = 1;
         foreach ($items as $item) {
-            $itemTotal = ((int) $item['product_price'] + (int) $item['lens_price']) * (int) $item['quantity'];
+            $itemTotal = (
+                (int) $item['product_price']
+                + (int) ($item['frame_price'] ?? 0)
+                + (int) $item['lens_price']
+            ) * (int) $item['quantity'];
 
             $lines[] = "";
             $lines[] = "{$no}. {$item['product_name']}";
             $lines[] = "   Warna      : {$item['color']}";
+            $lines[] = "   Frame     : " . ($item['frame_type'] ?? 'Standar');
             $lines[] = "   Lensa      : {$item['lens_type']}";
-            $lines[] = "   Harga Frame: Rp " . number_format($item['product_price'], 0, ',', '.');
+            $lines[] = "   Harga Produk: Rp " . number_format($item['product_price'], 0, ',', '.');
+            $lines[] = "   Harga Tipe Frame: Rp " . number_format((int) ($item['frame_price'] ?? 0), 0, ',', '.');
             $lines[] = "   Harga Lensa: Rp " . number_format($item['lens_price'],   0, ',', '.');
             $lines[] = "   Qty        : {$item['quantity']}";
             $lines[] = "   Pengiriman : " . ($item['delivery_type'] === 'delivery' ? 'Dikirim' : 'Ambil di toko');
@@ -205,13 +218,14 @@ class CartService
 
     /**
      * Generate a unique but deterministic key for a cart item based on its
-     * identifying attributes (product, colour, lens, delivery type).
+     * identifying attributes (product, colour, frame, lens, delivery type).
      */
     private function generateKey(array $item): string
     {
         $raw = implode('_', [
             $item['product_id']    ?? '',
             $item['color']         ?? '',
+            $item['frame_type']    ?? '',
             $item['lens_type']     ?? '',
             $item['delivery_type'] ?? '',
         ]);

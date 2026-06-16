@@ -35,6 +35,12 @@
             Layanan
           </a>
         </li>
+        <li>
+          <a href="{{ route('blog.index') }}" class="{{ request()->routeIs('blog.*') ? 'active' : '' }}">
+            <i class="fa-solid fa-newspaper"></i>
+            Blog
+          </a>
+        </li>
       </ul>
     </nav>
 
@@ -163,6 +169,10 @@
       <a href="{{ route('services.index') }}" class="{{ request()->routeIs('services.*') ? 'active' : '' }}">
         <i class="fa-solid fa-clipboard-list"></i>
         <span>Layanan</span>
+      </a>
+      <a href="{{ route('blog.index') }}" class="{{ request()->routeIs('blog.*') ? 'active' : '' }}">
+        <i class="fa-solid fa-newspaper"></i>
+        <span>Blog</span>
       </a>
       <a href="{{ route('cart.index') }}" class="{{ request()->routeIs('cart.*') ? 'active' : '' }}">
         <i class="fa-solid fa-cart-shopping"></i>

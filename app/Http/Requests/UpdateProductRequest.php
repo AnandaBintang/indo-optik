@@ -113,6 +113,21 @@ class UpdateProductRequest extends FormRequest
                     "fa-solid fa-glasses",
                 ]),
             ],
+            "frame_variants" => ["nullable", "array"],
+            "frame_variants.*.key" => ["nullable", "string", "max:50"],
+            "frame_variants.*.label" => ["nullable", "string", "max:80"],
+            "frame_variants.*.desc" => ["nullable", "string", "max:200"],
+            "frame_variants.*.price" => ["nullable", "integer", "min:0"],
+            "frame_variants.*.icon" => [
+                "nullable",
+                Rule::in([
+                    "fa-solid fa-glasses",
+                    "fa-solid fa-circle",
+                    "fa-regular fa-circle",
+                    "fa-solid fa-feather",
+                    "fa-solid fa-gem",
+                ]),
+            ],
         ];
     }
 
@@ -141,6 +156,7 @@ class UpdateProductRequest extends FormRequest
             "meta_description" => "meta description",
             "color_variants" => "varian warna",
             "lens_variants" => "varian lensa",
+            "frame_variants" => "varian frame",
         ];
     }
 

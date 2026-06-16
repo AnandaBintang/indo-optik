@@ -46,6 +46,8 @@ class CartController extends Controller
         $validated = $request->validate([
             'product_id'        => 'required|exists:products,id',
             'color'             => 'nullable|string|max:50',
+            'frame_type'        => 'nullable|string|max:100',
+            'frame_price'       => 'nullable|integer|min:0',
             'lens_type'         => 'nullable|string|max:100',
             'lens_price'        => 'nullable|integer|min:0',
             'quantity'          => 'integer|min:1|max:10',
@@ -59,6 +61,8 @@ class CartController extends Controller
             'product_id'        => $product->id,
             'product_name'      => $product->name,
             'product_price'     => $product->effective_price,
+            'frame_type'        => $validated['frame_type']        ?? 'Standar',
+            'frame_price'       => $validated['frame_price']       ?? 0,
             'lens_type'         => $validated['lens_type']         ?? 'Standar',
             'lens_price'        => $validated['lens_price']        ?? 0,
             'color'             => $validated['color']             ?? 'Hitam',

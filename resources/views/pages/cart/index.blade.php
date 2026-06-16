@@ -30,6 +30,9 @@
     $subtotal = 0;
     foreach ($cartItems as $item) {
       $subtotal += ($item['product_price'] ?? 0) * ($item['quantity'] ?? 1);
+      if (!empty($item['frame_price'])) {
+        $subtotal += ($item['frame_price'] ?? 0) * ($item['quantity'] ?? 1);
+      }
       if (!empty($item['lens_price'])) {
         $subtotal += ($item['lens_price'] ?? 0) * ($item['quantity'] ?? 1);
       }
@@ -41,9 +44,10 @@
     $waLines = ['Halo IndoOptik! Saya ingin memesan:', ''];
     $itemNum = 1;
     foreach ($cartItems as $item) {
-      $linePrice = ($item['product_price'] ?? 0) + ($item['lens_price'] ?? 0);
+      $linePrice = ($item['product_price'] ?? 0) + ($item['frame_price'] ?? 0) + ($item['lens_price'] ?? 0);
       $waLines[] = $itemNum . '. ' . ($item['product_name'] ?? 'Produk');
       if (!empty($item['color']))          $waLines[] = '   Warna: ' . $item['color'];
+      if (!empty($item['frame_type']))     $waLines[] = '   Frame: ' . $item['frame_type'];
       if (!empty($item['lens_type']))      $waLines[] = '   Lensa: ' . $item['lens_type'];
       if (!empty($item['delivery_type']))  $waLines[] = '   Pengiriman: ' . ($item['delivery_type'] === 'delivery' ? 'Antar ke Rumah' : 'Ambil di Toko');
       $waLines[] = '   Harga: Rp ' . number_format($linePrice, 0, ',', '.');
@@ -66,7 +70,7 @@
       @if($hasItems)
         @foreach($cartItems as $key => $item)
           @php
-            $itemPrice    = ($item['product_price'] ?? 0) + ($item['lens_price'] ?? 0);
+            $itemPrice    = ($item['product_price'] ?? 0) + ($item['frame_price'] ?? 0) + ($item['lens_price'] ?? 0);
             $itemQuantity = $item['quantity'] ?? 1;
             $itemTotal    = $itemPrice * $itemQuantity;
           @endphp
@@ -111,7 +115,7 @@
               </div>
 
               {{-- Item Details --}}
-              <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-sm">
+              <div class="grid grid-cols-1 sm:grid-cols-4 gap-3 text-sm">
                 @if(!empty($item['color']))
                   <p class="flex flex-col">
                     <span class="text-gray-400 text-xs mb-0.5">Warna</span>
@@ -126,6 +130,15 @@
                     <span class="text-gray-400 text-xs mb-0.5">Lensa</span>
                     <span class="text-neutral-900 font-semibold">
                       <i class="fa-solid fa-eye text-indigo-400 mr-1 opacity-70"></i>{{ $item['lens_type'] }}
+                    </span>
+                  </p>
+                @endif
+
+                @if(!empty($item['frame_type']))
+                  <p class="flex flex-col">
+                    <span class="text-gray-400 text-xs mb-0.5">Frame</span>
+                    <span class="text-neutral-900 font-semibold">
+                      <i class="fa-solid fa-glasses text-indigo-400 mr-1 opacity-70"></i>{{ $item['frame_type'] }}
                     </span>
                   </p>
                 @endif
@@ -162,9 +175,9 @@
                   </span>
                 @endif
 
-                @if(!empty($item['lens_price']) && $item['lens_price'] > 0)
+                @if((!empty($item['frame_price']) && $item['frame_price'] > 0) || (!empty($item['lens_price']) && $item['lens_price'] > 0))
                   <span class="text-xs text-gray-400 font-medium ml-auto">
-                    Frame + Lensa: Rp {{ number_format($item['product_price'], 0, ',', '.') }} + Rp {{ number_format($item['lens_price'], 0, ',', '.') }}
+                    Produk + Frame + Lensa: Rp {{ number_format($item['product_price'], 0, ',', '.') }} + Rp {{ number_format($item['frame_price'] ?? 0, 0, ',', '.') }} + Rp {{ number_format($item['lens_price'], 0, ',', '.') }}
                   </span>
                 @endif
               </div>
@@ -237,7 +250,7 @@
           <div class="space-y-3 mb-6 text-sm">
             @foreach($cartItems as $item)
               @php
-                $linePrice = (($item['product_price'] ?? 0) + ($item['lens_price'] ?? 0)) * ($item['quantity'] ?? 1);
+                $linePrice = (($item['product_price'] ?? 0) + ($item['frame_price'] ?? 0) + ($item['lens_price'] ?? 0)) * ($item['quantity'] ?? 1);
               @endphp
               <div class="flex justify-between gap-2">
                 <span class="text-gray-500 font-medium truncate max-w-[65%]">

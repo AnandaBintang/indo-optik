@@ -29,6 +29,7 @@ class Product extends Model
         'meta_description',
         'color_variants',
         'lens_variants',
+        'frame_variants',
     ];
 
     protected $appends = [
@@ -45,6 +46,7 @@ class Product extends Model
             'is_featured'    => 'boolean',
             'color_variants' => 'array',
             'lens_variants'  => 'array',
+            'frame_variants' => 'array',
         ];
     }
 

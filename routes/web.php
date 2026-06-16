@@ -9,6 +9,7 @@ use App\Http\Controllers\ServiceController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Admin;
+use App\Http\Controllers\BlogArticleController;
 use Illuminate\Support\Facades\Route;
 
 // -------------------------------------------------------------------------
@@ -25,6 +26,12 @@ Route::get("/produk/{slug}", [ProductController::class, "show"])->name(
 );
 Route::get("/layanan", [ServiceController::class, "index"])->name(
     "services.index",
+);
+Route::get("/blog", [BlogArticleController::class, "index"])->name(
+    "blog.index",
+);
+Route::get("/blog/{slug}", [BlogArticleController::class, "show"])->name(
+    "blog.show",
 );
 
 // -------------------------------------------------------------------------
@@ -134,6 +141,9 @@ Route::prefix("admin")
             "toggleStatus",
         ])->name("promo-codes.toggle-status");
         Route::resource("promo-codes", Admin\PromoCodeController::class);
+
+        // ---- Blog Articles ----
+        Route::resource("blog-articles", Admin\BlogArticleController::class);
 
         // ---- Settings ----
         Route::get("settings", [Admin\SettingController::class, "index"])->name(

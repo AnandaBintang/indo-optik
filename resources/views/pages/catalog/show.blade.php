@@ -11,8 +11,10 @@
 @php
   $colorVariants = is_array($product->color_variants ?? null) ? $product->color_variants : [];
   $lensVariants = is_array($product->lens_variants ?? null) ? $product->lens_variants : [];
+  $frameVariants = is_array($product->frame_variants ?? null) ? $product->frame_variants : [];
   $colorVariantList = array_values($colorVariants);
   $lensVariantList = array_values($lensVariants);
+  $frameVariantList = array_values($frameVariants);
   $defaultColorLabel = $colorVariantList[0]['label'] ?? 'Hitam';
   $galleryImages = collect([$product->image_url])
       ->merge($product->images->pluck('image_url'))
@@ -171,7 +173,42 @@
       {{-- Warna --}}
       <div>
         <div class="flex justify-between items-end mb-4">
-          <h3 class="text-base font-bold text-neutral-900">1. Pilih Warna</h3>
+          <h3 class="text-base font-bold text-neutral-900">1. Pilih Tipe Frame</h3>
+          <span class="text-sm font-semibold text-indigo-600" id="selected-frame-label">{{ $frameVariantList[0]['label'] ?? 'Full Rim' }}</span>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-3" id="frame-options" role="radiogroup" aria-label="Tipe Frame">
+          @if(count($frameVariantList))
+            @foreach($frameVariantList as $index => $variant)
+              @php
+                $key = $variant['key']
+                  ?? \Illuminate\Support\Str::slug($variant['label'] ?? 'frame');
+                $label = $variant['label'] ?? ucfirst($key);
+                $desc = $variant['desc'] ?? '';
+                $priceAddon = (int) ($variant['priceAddon'] ?? $variant['price'] ?? 0);
+                $icon = $variant['icon'] ?? 'fa-solid fa-glasses';
+                $isSelected = $index === 0;
+              @endphp
+              <label class="lens-option {{ $isSelected ? 'selected' : '' }} cursor-pointer" id="frame-{{ $key }}">
+                <input type="radio" name="frame_type" value="{{ $key }}" class="sr-only" {{ $isSelected ? 'checked' : '' }} />
+                <div class="border-2 {{ $isSelected ? 'border-indigo-500 bg-indigo-50' : 'border-zinc-200 hover:border-indigo-400 hover:bg-indigo-50/50' }} rounded-2xl p-4 transition-all duration-200">
+                  <div class="flex items-start justify-between mb-1">
+                    <span class="font-bold text-sm text-neutral-900"><i class="{{ $icon }} text-indigo-500 mr-1"></i>{{ $label }}</span>
+                    <span class="text-xs font-bold text-indigo-600">+Rp {{ number_format($priceAddon, 0, ',', '.') }}</span>
+                  </div>
+                  @if($desc)
+                    <span class="text-xs text-gray-500">{{ $desc }}</span>
+                  @endif
+                </div>
+              </label>
+            @endforeach
+          @endif
+        </div>
+      </div>
+
+      {{-- Warna --}}
+      <div>
+        <div class="flex justify-between items-end mb-4">
+          <h3 class="text-base font-bold text-neutral-900">2. Pilih Warna</h3>
             <span class="text-sm font-semibold text-indigo-600" id="selected-color-label">{{ $defaultColorLabel }}</span>
         </div>
         {{-- Color swatches injected by JS via COLOR_VARIANTS; fallback static swatches --}}
@@ -229,7 +266,7 @@
       {{-- Tipe Lensa --}}
       <div>
         <div class="flex justify-between items-end mb-4">
-          <h3 class="text-base font-bold text-neutral-900">2. Pilih Tipe Lensa</h3>
+          <h3 class="text-base font-bold text-neutral-900">3. Pilih Tipe Lensa</h3>
           <a href="{{ route('services.index') }}" class="text-sm text-indigo-600 hover:underline">Panduan Lensa</a>
         </div>
         {{-- Lens options injected by JS via LENS_VARIANTS; fallback static options --}}
@@ -308,7 +345,7 @@
       {{-- Resep --}}
       <div>
         <h3 class="text-base font-bold text-neutral-900 mb-4">
-          3. Resep Kacamata
+          4. Resep Kacamata
           <span class="text-gray-400 font-normal text-sm ml-1">(Opsional)</span>
         </h3>
         <div class="prescription-section space-y-6">
@@ -372,7 +409,7 @@
 
       {{-- Pengiriman --}}
       <div>
-        <h3 class="text-base font-bold text-neutral-900 mb-4">4. Pengiriman</h3>
+        <h3 class="text-base font-bold text-neutral-900 mb-4">5. Pengiriman</h3>
         <div class="grid grid-cols-2 gap-4" role="radiogroup">
 
           <div class="delivery-option selected"
@@ -398,7 +435,7 @@
 
       {{-- Kode Promo --}}
       <div>
-        <h3 class="text-base font-bold text-neutral-900 mb-4">5. Kode Promo</h3>
+        <h3 class="text-base font-bold text-neutral-900 mb-4">6. Kode Promo</h3>
         <div class="bg-neutral-50 border border-zinc-200 rounded-2xl p-4 md:p-5 space-y-3">
           <div class="flex flex-col sm:flex-row gap-3">
             <input
@@ -479,6 +516,9 @@
 </script>
 <script type="application/json" id="product-lens-variants">
 {!! json_encode($lensVariantList) !!}
+</script>
+<script type="application/json" id="product-frame-variants">
+{!! json_encode($frameVariantList) !!}
 </script>
 <script type="application/json" id="product-gallery-images">
 {!! json_encode($galleryImages) !!}

@@ -129,3 +129,45 @@ test("admin can update product variants and keep uploaded color image references
         ->and($colorVariant["images"][0])->toBe("https://cdn.example.com/coklat-main.jpg")
         ->and($colorVariant["images"][1])->toStartWith("/storage/products/variants/");
 });
+
+test("admin can store product frame variants", function () {
+    $admin = makeAdminUser();
+    $category = makeActiveCategory();
+
+    $response = $this->actingAs($admin)->post(route("admin.products.store"), [
+        "name" => "Frame Type Product",
+        "category_id" => $category->id,
+        "description" => "Desc",
+        "short_description" => "Short desc",
+        "price" => 650000,
+        "stock" => 5,
+        "sku" => "FR-TYPE-100",
+        "status" => "active",
+        "frame_variants" => [
+            [
+                "key" => "full-rim",
+                "label" => "Full Rim",
+                "desc" => "Frame penuh klasik",
+                "price" => 0,
+                "icon" => "fa-solid fa-glasses",
+            ],
+            [
+                "key" => "titanium",
+                "label" => "Titanium",
+                "desc" => "Frame ringan premium",
+                "price" => 250000,
+                "icon" => "fa-solid fa-feather",
+            ],
+        ],
+    ]);
+
+    $response->assertRedirect(route("admin.products.index"));
+
+    $product = Product::query()->where("name", "Frame Type Product")->firstOrFail();
+
+    expect($product->frame_variants)->toHaveCount(2)
+        ->and($product->frame_variants[0]["key"])->toBe("full-rim")
+        ->and($product->frame_variants[0]["priceAddon"])->toBe(0)
+        ->and($product->frame_variants[1]["label"])->toBe("Titanium")
+        ->and($product->frame_variants[1]["priceAddon"])->toBe(250000);
+});

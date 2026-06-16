@@ -63,9 +63,21 @@
         @php
           $colorVariants = old('color_variants', []);
           $lensVariants = old('lens_variants', []);
+          $frameVariants = old('frame_variants', []);
           if (!is_array($colorVariants) || count($colorVariants) === 0) {
             $colorVariants = [
               ['key' => '', 'label' => '', 'color' => '#111827', 'images' => ''],
+            ];
+          }
+          if (!is_array($frameVariants) || count($frameVariants) === 0) {
+            $frameVariants = [
+              [
+                'key' => 'full-rim',
+                'label' => 'Full Rim',
+                'desc' => 'Frame penuh klasik',
+                'price' => 0,
+                'icon' => 'fa-solid fa-glasses',
+              ],
             ];
           }
           if (!is_array($lensVariants) || count($lensVariants) === 0) {
@@ -86,6 +98,13 @@
             'fa-solid fa-sun' => 'Matahari (Photochromic)',
             'fa-solid fa-glasses' => 'Kacamata (Premium)',
           ];
+          $frameIconOptions = [
+            'fa-solid fa-glasses' => 'Kacamata',
+            'fa-solid fa-circle' => 'Full Rim',
+            'fa-regular fa-circle' => 'Rimless',
+            'fa-solid fa-feather' => 'Ringan',
+            'fa-solid fa-gem' => 'Premium',
+          ];
         @endphp
 
         <!-- Varian Produk -->
@@ -95,6 +114,56 @@
           </h2>
 
           <div class="space-y-6">
+            <div>
+              <div class="flex items-center justify-between mb-3">
+                <div>
+                  <h3 class="text-sm font-bold text-neutral-900">Varian Frame</h3>
+                  <p class="text-xs text-gray-500">Atur tipe frame, deskripsi, harga tambahan, dan ikon.</p>
+                </div>
+                <button type="button" id="add-frame-variant" class="btn btn-ghost btn-sm">
+                  <i class="fa-solid fa-plus"></i> Tambah Frame
+                </button>
+              </div>
+
+              <div id="frame-variant-list" class="space-y-3">
+                @foreach($frameVariants as $index => $variant)
+                  <div class="grid grid-cols-1 md:grid-cols-12 gap-3 items-end" data-variant-row>
+                    <div class="md:col-span-4">
+                      <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Label</label>
+                      <input type="text" name="frame_variants[{{ $index }}][label]" value="{{ $variant['label'] ?? '' }}"
+                        class="w-full bg-neutral-50 rounded-xl py-2.5 px-3 text-xs font-medium border border-zinc-200" placeholder="Full Rim">
+                    </div>
+                    <div class="md:col-span-2">
+                      <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Harga</label>
+                      <input type="number" name="frame_variants[{{ $index }}][price]" value="{{ $variant['price'] ?? ($variant['priceAddon'] ?? 0) }}" min="0"
+                        class="w-full bg-neutral-50 rounded-xl py-2.5 px-3 text-xs font-medium border border-zinc-200" placeholder="0">
+                    </div>
+                    <div class="md:col-span-3">
+                      <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Deskripsi</label>
+                      <input type="text" name="frame_variants[{{ $index }}][desc]" value="{{ $variant['desc'] ?? '' }}"
+                        class="w-full bg-neutral-50 rounded-xl py-2.5 px-3 text-xs font-medium border border-zinc-200" placeholder="Frame penuh klasik">
+                    </div>
+                    <div class="md:col-span-2">
+                      <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Ikon</label>
+                      <select name="frame_variants[{{ $index }}][icon]"
+                        class="w-full bg-neutral-50 rounded-xl py-2.5 px-3 text-xs font-medium border border-zinc-200">
+                        @foreach($frameIconOptions as $iconClass => $iconLabel)
+                          <option value="{{ $iconClass }}" {{ ($variant['icon'] ?? 'fa-solid fa-glasses') === $iconClass ? 'selected' : '' }}>
+                            {{ $iconLabel }}
+                          </option>
+                        @endforeach
+                      </select>
+                    </div>
+                    <div class="md:col-span-1 flex justify-end">
+                      <button type="button" class="btn btn-ghost btn-sm" data-variant-remove>
+                        <i class="fa-solid fa-trash"></i>
+                      </button>
+                    </div>
+                  </div>
+                @endforeach
+              </div>
+            </div>
+
             <div>
               <div class="flex items-center justify-between mb-3">
                 <div>
@@ -422,15 +491,54 @@
   </div>
 </template>
 
+<template id="frame-variant-template">
+  <div class="grid grid-cols-1 md:grid-cols-12 gap-3 items-end" data-variant-row>
+    <div class="md:col-span-4">
+      <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Label</label>
+      <input type="text" name="frame_variants[__INDEX__][label]"
+        class="w-full bg-neutral-50 rounded-xl py-2.5 px-3 text-xs font-medium border border-zinc-200" placeholder="Full Rim">
+    </div>
+    <div class="md:col-span-2">
+      <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Harga</label>
+      <input type="number" name="frame_variants[__INDEX__][price]" value="0" min="0"
+        class="w-full bg-neutral-50 rounded-xl py-2.5 px-3 text-xs font-medium border border-zinc-200" placeholder="0">
+    </div>
+    <div class="md:col-span-3">
+      <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Deskripsi</label>
+      <input type="text" name="frame_variants[__INDEX__][desc]"
+        class="w-full bg-neutral-50 rounded-xl py-2.5 px-3 text-xs font-medium border border-zinc-200" placeholder="Frame penuh klasik">
+    </div>
+    <div class="md:col-span-2">
+      <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Ikon</label>
+      <select name="frame_variants[__INDEX__][icon]"
+        class="w-full bg-neutral-50 rounded-xl py-2.5 px-3 text-xs font-medium border border-zinc-200">
+        @foreach($frameIconOptions as $iconClass => $iconLabel)
+          <option value="{{ $iconClass }}" {{ $iconClass === 'fa-solid fa-glasses' ? 'selected' : '' }}>
+            {{ $iconLabel }}
+          </option>
+        @endforeach
+      </select>
+    </div>
+    <div class="md:col-span-1 flex justify-end">
+      <button type="button" class="btn btn-ghost btn-sm" data-variant-remove>
+        <i class="fa-solid fa-trash"></i>
+      </button>
+    </div>
+  </div>
+</template>
+
 @push('scripts')
 <script>
   (function () {
     const colorList = document.getElementById('color-variant-list');
     const lensList = document.getElementById('lens-variant-list');
+    const frameList = document.getElementById('frame-variant-list');
     const colorTemplate = document.getElementById('color-variant-template');
     const lensTemplate = document.getElementById('lens-variant-template');
+    const frameTemplate = document.getElementById('frame-variant-template');
     const addColorBtn = document.getElementById('add-color-variant');
     const addLensBtn = document.getElementById('add-lens-variant');
+    const addFrameBtn = document.getElementById('add-frame-variant');
 
     function bindRemove(container) {
       if (!container) return;
@@ -464,8 +572,16 @@
       });
     }
 
+    if (addFrameBtn && frameList && frameTemplate) {
+      let frameIndex = frameList.children.length;
+      addFrameBtn.addEventListener('click', function () {
+        addRow(frameList, frameTemplate, frameIndex++);
+      });
+    }
+
     bindRemove(colorList);
     bindRemove(lensList);
+    bindRemove(frameList);
   })();
 </script>
 @endpush

@@ -102,9 +102,13 @@ class ProductController extends Controller
         $lensVariants = $this->normalizeLensVariants(
             $request->input('lens_variants', [])
         );
+        $frameVariants = $this->normalizeFrameVariants(
+            $request->input('frame_variants', [])
+        );
 
         $validated['color_variants'] = $colorVariants !== [] ? $colorVariants : null;
         $validated['lens_variants'] = $lensVariants !== [] ? $lensVariants : null;
+        $validated['frame_variants'] = $frameVariants !== [] ? $frameVariants : null;
 
         $product = Product::create($validated);
 
@@ -187,9 +191,13 @@ class ProductController extends Controller
         $lensVariants = $this->normalizeLensVariants(
             $request->input('lens_variants', [])
         );
+        $frameVariants = $this->normalizeFrameVariants(
+            $request->input('frame_variants', [])
+        );
 
         $validated['color_variants'] = $colorVariants !== [] ? $colorVariants : null;
         $validated['lens_variants'] = $lensVariants !== [] ? $lensVariants : null;
+        $validated['frame_variants'] = $frameVariants !== [] ? $frameVariants : null;
 
         $product->update($validated);
 
@@ -379,6 +387,41 @@ class ProductController extends Controller
                 'desc' => $desc,
                 'priceAddon' => max(0, $price),
                 'icon' => $icon !== '' ? $icon : 'fa-solid fa-eye',
+            ];
+        }
+
+        return $normalized;
+    }
+
+    /**
+     * Normalize frame variants from admin inputs.
+     *
+     * @param  array<int, array<string, mixed>>  $variants
+     * @return array<int, array<string, mixed>>
+     */
+    private function normalizeFrameVariants(array $variants): array
+    {
+        $normalized = [];
+        $usedKeys = [];
+
+        foreach ($variants as $variant) {
+            $label = trim((string) ($variant['label'] ?? ''));
+            $desc = trim((string) ($variant['desc'] ?? ''));
+            $price = (int) ($variant['price'] ?? 0);
+            $icon = trim((string) ($variant['icon'] ?? ''));
+
+            if ($label === '' && $desc === '' && $price === 0 && $icon === '') {
+                continue;
+            }
+
+            $key = $this->uniqueVariantKey($label, $usedKeys, 'frame');
+
+            $normalized[] = [
+                'key' => $key,
+                'label' => $label !== '' ? $label : ucfirst($key),
+                'desc' => $desc,
+                'priceAddon' => max(0, $price),
+                'icon' => $icon !== '' ? $icon : 'fa-solid fa-glasses',
             ];
         }
 

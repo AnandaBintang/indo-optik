@@ -1,0 +1,72 @@
+<h2>Feature Scope</h2>
+<p class="subtitle">Choose the product behavior you want for "Choose Frame Type"; the blog feature can be added alongside either option.</p>
+
+<div class="cards">
+  <div class="card" data-choice="product_attribute" onclick="toggleSelect(this)">
+    <div class="card-image">
+      <div class="mockup">
+        <div class="mockup-header">Product Detail</div>
+        <div class="mockup-body">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start">
+            <div class="placeholder" style="height:180px">Product image</div>
+            <div>
+              <div class="label">Rayban Classic Aviator</div>
+              <h3 style="margin:8px 0 12px">Choose Frame Type</h3>
+              <div style="display:grid;gap:8px">
+                <button class="mock-button">Full Rim</button>
+                <button class="mock-button" style="background:#eef2ff;color:#4338ca">Half Rim</button>
+                <button class="mock-button">Rimless</button>
+              </div>
+              <div class="placeholder" style="height:54px;margin-top:16px">Color and lens choices stay below</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>A. Product Attribute</h3>
+      <p>Each product has one frame type, shown as detail metadata and available as a catalog filter.</p>
+    </div>
+  </div>
+
+  <div class="card" data-choice="product_variant" onclick="toggleSelect(this)">
+    <div class="card-image">
+      <div class="mockup">
+        <div class="mockup-header">Product Detail</div>
+        <div class="mockup-body">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start">
+            <div class="placeholder" style="height:180px">Image changes by selected frame</div>
+            <div>
+              <div class="label">Custom Optical Frame</div>
+              <h3 style="margin:8px 0 12px">Choose Frame Type</h3>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+                <button class="mock-button">Full Rim<br><small>+ Rp 0</small></button>
+                <button class="mock-button" style="background:#eef2ff;color:#4338ca">Titanium<br><small>+ Rp 250.000</small></button>
+              </div>
+              <div class="placeholder" style="height:54px;margin-top:16px">Cart captures frame + color + lens</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>B. Product Variant</h3>
+      <p>A product can offer multiple frame types with optional price add-ons and images, similar to lens/color variants.</p>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <h3>Blog Article Preview</h3>
+  <div class="mockup">
+    <div class="mockup-header">Public Blog + Admin CRUD</div>
+    <div class="mockup-body">
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px">
+        <div class="placeholder" style="height:120px">Article card</div>
+        <div class="placeholder" style="height:120px">Article card</div>
+        <div class="placeholder" style="height:120px">Article card</div>
+      </div>
+      <div class="placeholder" style="height:64px;margin-top:14px">Article detail: title, cover image, content, SEO fields, published status</div>
+    </div>
+  </div>
+</div>
