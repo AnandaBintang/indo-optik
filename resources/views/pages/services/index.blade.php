@@ -31,7 +31,7 @@
 
   <!-- Form Pemesanan -->
   <div class="bg-white rounded-[32px] p-6 md:p-10 shadow-xl shadow-indigo-100/50 border border-zinc-100" data-animate="slide-left">
-    <form action="{{ route('services.booking.store') }}" method="POST" id="booking-form" class="space-y-8">
+    <form action="{{ route('services.booking.store', [], false) }}" method="POST" id="booking-form" class="space-y-8">
       @csrf
 
       <!-- Layanan -->
