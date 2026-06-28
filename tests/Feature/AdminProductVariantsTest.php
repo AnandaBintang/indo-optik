@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\Category;
+use App\Models\ProductImage;
 use App\Models\Product;
 use App\Models\User;
 use Illuminate\Http\UploadedFile;
@@ -198,4 +199,41 @@ test("admin can store product frame variants", function () {
         ->and($product->frame_variants[0]["priceAddon"])->toBe(0)
         ->and($product->frame_variants[1]["label"])->toBe("Titanium")
         ->and($product->frame_variants[1]["priceAddon"])->toBe(250000);
+});
+
+test("admin can permanently delete trashed product with local and external images", function () {
+    Storage::fake("public");
+
+    $admin = makeAdminUser();
+    $category = makeActiveCategory();
+    Storage::disk("public")->put("products/main.jpg", "main");
+    Storage::disk("public")->put("products/gallery.jpg", "gallery");
+
+    $product = Product::factory()->create([
+        "category_id" => $category->id,
+        "name" => "Delete Permanent Product",
+        "image" => "products/main.jpg",
+        "status" => "active",
+    ]);
+    $product->images()->create([
+        "image" => "products/gallery.jpg",
+        "alt_text" => "Gallery",
+        "sort_order" => 1,
+    ]);
+    $product->images()->create([
+        "image" => "https://cdn.example.com/external.jpg",
+        "alt_text" => "External",
+        "sort_order" => 2,
+    ]);
+    $product->delete();
+
+    $response = $this->actingAs($admin)->delete(route("admin.products.destroy", $product->id));
+
+    $response->assertRedirect(route("admin.products.index"));
+
+    expect(Product::withTrashed()->find($product->id))->toBeNull()
+        ->and(ProductImage::where("product_id", $product->id)->exists())->toBeFalse();
+
+    Storage::disk("public")->assertMissing("products/main.jpg");
+    Storage::disk("public")->assertMissing("products/gallery.jpg");
 });

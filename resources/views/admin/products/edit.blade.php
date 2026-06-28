@@ -393,8 +393,8 @@
                   </div>
                 @endforeach
               </div>
-              <p class="text-xs text-amber-600 mb-3 font-medium flex items-center gap-1.5">
-                 <i class="fa-solid fa-circle-info"></i> Centang tempat sampah untuk menghapus gambar
+              <p class="text-xs text-gray-500 mb-3 font-medium flex items-center gap-1.5">
+                 <i class="fa-solid fa-circle-info"></i> Klik ikon tong sampah pada gambar yang ingin dihapus, lalu simpan perubahan.
               </p>
             @endif
 

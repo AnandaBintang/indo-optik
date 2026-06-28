@@ -239,20 +239,16 @@ class ProductController extends Controller
      */
     public function destroy(int $id): RedirectResponse
     {
-        $product = Product::withTrashed()->findOrFail($id);
+        $product = Product::withTrashed()->with('images')->findOrFail($id);
 
         if ($product->trashed()) {
             // Permanently delete the product and its images
             foreach ($product->images as $img) {
-                if (Storage::disk('public')->exists($img->image)) {
-                    Storage::disk('public')->delete($img->image);
-                }
+                $this->deletePublicStorageFile($img->image);
                 $img->delete();
             }
 
-            if ($product->image && Storage::disk('public')->exists($product->image)) {
-                Storage::disk('public')->delete($product->image);
-            }
+            $this->deletePublicStorageFile($product->image);
 
             $product->forceDelete();
 
@@ -266,6 +262,17 @@ class ProductController extends Controller
         return redirect()
             ->route('admin.products.index')
             ->with('success', "Produk \"{$product->name}\" berhasil dihapus.");
+    }
+
+    private function deletePublicStorageFile(?string $path): void
+    {
+        if (! $path || Str::startsWith($path, ['http://', 'https://', '/storage/'])) {
+            return;
+        }
+
+        if (Storage::disk('public')->exists($path)) {
+            Storage::disk('public')->delete($path);
+        }
     }
 
     /**
