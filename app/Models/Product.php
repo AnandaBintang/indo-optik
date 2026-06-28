@@ -123,4 +123,24 @@ class Product extends Model
             : asset('storage/' . $path);
     }
 
+    public function getSafeDescriptionHtmlAttribute(): string
+    {
+        $html = (string) ($this->description ?? '');
+        $html = preg_replace('/<(script|style)\b[^>]*>.*?<\/\1>/is', '', $html) ?? '';
+        $html = strip_tags($html, '<p><br><strong><b><em><i><ul><ol><li><a>');
+        $html = preg_replace('/<(p|br|strong|b|em|i|ul|ol|li)\b[^>]*>/i', '<$1>', $html) ?? '';
+        $html = preg_replace_callback('/<a\b([^>]*)>/i', function (array $matches): string {
+            preg_match('/\s+href\s*=\s*([\'"])(.*?)\1/i', $matches[1], $hrefMatch);
+            $href = $hrefMatch[2] ?? '';
+
+            if (! preg_match('/^(https?:|mailto:|tel:|#)/i', $href)) {
+                return '<a>';
+            }
+
+            return '<a href="' . e($href) . '" rel="noopener noreferrer">';
+        }, $html) ?? '';
+
+        return trim($html) !== '' ? $html : e($this->short_description ?? '');
+    }
+
 }

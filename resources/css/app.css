@@ -1235,6 +1235,52 @@ body {
     background: var(--color-primary-bg);
 }
 
+.product-description {
+    display: grid;
+    gap: 0.75rem;
+}
+.product-description p {
+    margin: 0;
+}
+.product-description ul,
+.product-description ol {
+    margin: 0;
+    padding-left: 1.25rem;
+}
+.product-description a {
+    color: var(--color-primary-dark);
+    font-weight: 600;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+}
+
+.booking-calendar {
+    width: 100%;
+    max-width: 100%;
+}
+.booking-calendar-grid {
+    grid-auto-rows: 2.25rem;
+}
+.calendar-day {
+    min-width: 2.25rem;
+    min-height: 2.25rem;
+}
+.calendar-day-empty {
+    pointer-events: none;
+}
+.calendar-nav {
+    width: 2.25rem;
+    height: 2.25rem;
+    border-radius: var(--radius-full);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+.calendar-nav:disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+}
+
 /* =========================================
    SECTION UTILITIES
    ========================================= */

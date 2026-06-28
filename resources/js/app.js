@@ -958,70 +958,92 @@ function initProductPage() {
             const lens =
                 lensVariants[state.selectedLens]?.label || state.selectedLens;
 
-            try {
-                localStorage.setItem("indooptik_cart_qty", "1");
-                localStorage.setItem(
-                    "indooptik_cart",
-                    JSON.stringify({
-                        name:
-                            document.querySelector("h1")?.textContent?.trim() ||
-                            "Produk",
-                        color,
-                        frame,
-                        lens,
-                        delivery: state.delivery,
-                        total: pricing.total,
-                        promoCode: state.appliedPromo?.code || null,
-                    }),
-                );
-            } catch (e) {
-                /* ignore */
-            }
-
             const badge = document.getElementById("cart-badge");
-            if (badge) {
-                badge.textContent = "1";
-                badge.style.display = "flex";
-            }
-
-            showToast(
-                "success",
-                "Ditambahkan!",
-                `${frame} + ${color} + Lensa ${lens} berhasil masuk keranjang.`,
-            );
-
             const cartUrl = addToCartBtn.dataset.cartUrl;
             const productId = addToCartBtn.dataset.productId;
             const csrf = document.querySelector('meta[name="csrf-token"]')?.content;
-            if (cartUrl && productId && csrf) {
-                fetch(cartUrl, {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                        "Accept": "application/json",
-                        "X-CSRF-TOKEN": csrf,
-                    },
-                    body: JSON.stringify({
-                        product_id: productId,
-                        color,
-                        frame_type: frame,
-                        frame_price: pricing.frameAddon,
-                        lens_type: lens,
-                        lens_price: pricing.lensAddon,
-                        quantity: 1,
-                        delivery_type: state.delivery,
-                    }),
-                })
-                    .then((response) => response.ok ? response.json() : Promise.reject(response))
-                    .then((data) => {
-                        if (badge && data.cart_count) {
-                            badge.textContent = String(data.cart_count);
-                        }
-                    })
-                    .catch(() => {
-                        showToast("error", "Gagal", "Produk belum tersimpan ke keranjang server.");
-                    });
+
+            if (!cartUrl || !productId || !csrf) {
+                showToast(
+                    "error",
+                    "Gagal",
+                    "Data produk belum lengkap untuk disimpan ke keranjang.",
+                );
+                return;
             }
+
+            addToCartBtn.disabled = true;
+            fetch(cartUrl, {
+                method: "POST",
+                credentials: "same-origin",
+                headers: {
+                    "Content-Type": "application/json",
+                    Accept: "application/json",
+                    "X-CSRF-TOKEN": csrf,
+                },
+                body: JSON.stringify({
+                    product_id: productId,
+                    color,
+                    frame_type: frame,
+                    frame_price: pricing.frameAddon,
+                    lens_type: lens,
+                    lens_price: pricing.lensAddon,
+                    quantity: 1,
+                    delivery_type: state.delivery,
+                }),
+            })
+                .then(async (response) => {
+                    const data = await response.json().catch(() => ({}));
+                    if (!response.ok) {
+                        throw new Error(
+                            data?.message ||
+                                "Produk belum tersimpan ke keranjang server.",
+                        );
+                    }
+                    return data;
+                })
+                .then((data) => {
+                    try {
+                        localStorage.setItem(
+                            "indooptik_cart_qty",
+                            String(data.cart_count || 1),
+                        );
+                        localStorage.setItem(
+                            "indooptik_cart",
+                            JSON.stringify({
+                                name:
+                                    document.querySelector("h1")?.textContent?.trim() ||
+                                    "Produk",
+                                color,
+                                frame,
+                                lens,
+                                delivery: state.delivery,
+                                total: pricing.total,
+                                promoCode: state.appliedPromo?.code || null,
+                            }),
+                        );
+                    } catch (e) {
+                        /* ignore */
+                    }
+
+                    if (badge) {
+                        badge.textContent = String(data.cart_count || 1);
+                        badge.style.display = "flex";
+                    }
+
+                    showToast(
+                        "success",
+                        "Ditambahkan!",
+                        data.message ||
+                            `${frame} + ${color} + Lensa ${lens} berhasil masuk keranjang.`,
+                    );
+                })
+                .catch((error) => {
+                    showToast("error", "Gagal", error.message);
+                })
+                .finally(() => {
+                    addToCartBtn.disabled = false;
+                });
         });
     }
 
@@ -1104,42 +1126,147 @@ function initProductPage() {
    IndoOptik — Appointment / Calendar
    ========================================= */
 function initCalendar() {
-    const calDays = document.querySelectorAll("[data-cal-day]");
+    const calendar = document.querySelector(".booking-calendar");
+    const grid = document.querySelector("[data-cal-grid]");
+    const title = document.querySelector("[data-cal-title]");
+    const prevBtn = document.querySelector("[data-cal-prev]");
+    const nextBtn = document.querySelector("[data-cal-next]");
+    const dateInput = document.getElementById("booking-date");
+    const errorEl = document.querySelector("[data-booking-error]");
     const timeBtns = document.querySelectorAll("[data-time-slot], [data-time-btn]");
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const monthLabels = [
+        "Januari",
+        "Februari",
+        "Maret",
+        "April",
+        "Mei",
+        "Juni",
+        "Juli",
+        "Agustus",
+        "September",
+        "Oktober",
+        "November",
+        "Desember",
+    ];
+    let visibleMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+    let selectedDate = null;
 
-    calDays.forEach((day) => {
-        day.addEventListener("click", () => {
-            calDays.forEach((d) => {
-                d.classList.remove(
-                    "bg-indigo-500",
-                    "bg-indigo-600",
-                    "text-white",
-                    "font-bold",
-                    "shadow-md",
-                    "shadow-indigo-200",
-                    "selected",
-                );
-                d.classList.add(
-                    "hover:bg-indigo-50",
-                    "hover:text-indigo-600",
-                    "text-neutral-700",
-                );
+    function formatDate(date) {
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, "0");
+        const day = String(date.getDate()).padStart(2, "0");
+        return `${year}-${month}-${day}`;
+    }
+
+    function selectDate(date) {
+        selectedDate = formatDate(date);
+        if (dateInput) dateInput.value = selectedDate;
+        if (errorEl) errorEl.classList.add("hidden");
+        renderCalendar();
+    }
+
+    function renderCalendar() {
+        if (!calendar || !grid || !title) return;
+
+        title.textContent = `${monthLabels[visibleMonth.getMonth()]} ${visibleMonth.getFullYear()}`;
+        grid.innerHTML = "";
+
+        const firstDay = new Date(
+            visibleMonth.getFullYear(),
+            visibleMonth.getMonth(),
+            1,
+        );
+        const daysInMonth = new Date(
+            visibleMonth.getFullYear(),
+            visibleMonth.getMonth() + 1,
+            0,
+        ).getDate();
+
+        for (let i = 0; i < firstDay.getDay(); i++) {
+            const spacer = document.createElement("div");
+            spacer.className = "calendar-day calendar-day-empty";
+            spacer.setAttribute("aria-hidden", "true");
+            grid.appendChild(spacer);
+        }
+
+        for (let day = 1; day <= daysInMonth; day++) {
+            const date = new Date(
+                visibleMonth.getFullYear(),
+                visibleMonth.getMonth(),
+                day,
+            );
+            const isPast = date < today;
+            const value = formatDate(date);
+            const btn = document.createElement("button");
+            btn.type = "button";
+            btn.dataset.calDay = value;
+            btn.textContent = String(day);
+            btn.disabled = isPast;
+            btn.className =
+                "calendar-day h-9 w-9 mx-auto flex items-center justify-center rounded-full text-sm transition-all duration-150";
+
+            if (isPast) {
+                btn.className += " text-gray-300 cursor-not-allowed";
+                btn.setAttribute("aria-label", `${value} tidak tersedia`);
+            } else if (selectedDate === value) {
+                btn.className +=
+                    " selected bg-indigo-500 text-white font-bold shadow-md shadow-indigo-200";
+                btn.setAttribute("aria-pressed", "true");
+            } else {
+                btn.className +=
+                    " cursor-pointer hover:bg-indigo-50 hover:text-indigo-600 text-neutral-700";
+                btn.setAttribute("aria-pressed", "false");
+            }
+
+            btn.addEventListener("click", () => {
+                if (isPast) {
+                    if (errorEl) {
+                        errorEl.textContent =
+                            "Tanggal booking tidak boleh sebelum hari ini.";
+                        errorEl.classList.remove("hidden");
+                    }
+                    return;
+                }
+                selectDate(date);
             });
-            day.classList.add(
-                "bg-indigo-500",
-                "text-white",
-                "font-bold",
-                "shadow-md",
-                "shadow-indigo-200",
-                "selected",
+
+            grid.appendChild(btn);
+        }
+
+        if (prevBtn) {
+            const prevMonth = new Date(
+                visibleMonth.getFullYear(),
+                visibleMonth.getMonth() - 1,
+                1,
             );
-            day.classList.remove(
-                "hover:bg-indigo-50",
-                "hover:text-indigo-600",
-                "text-neutral-700",
+            prevBtn.disabled =
+                prevMonth < new Date(today.getFullYear(), today.getMonth(), 1);
+        }
+    }
+
+    if (prevBtn) {
+        prevBtn.addEventListener("click", () => {
+            visibleMonth = new Date(
+                visibleMonth.getFullYear(),
+                visibleMonth.getMonth() - 1,
+                1,
             );
+            renderCalendar();
         });
-    });
+    }
+
+    if (nextBtn) {
+        nextBtn.addEventListener("click", () => {
+            visibleMonth = new Date(
+                visibleMonth.getFullYear(),
+                visibleMonth.getMonth() + 1,
+                1,
+            );
+            renderCalendar();
+        });
+    }
 
     timeBtns.forEach((btn) => {
         btn.addEventListener("click", () => {
@@ -1159,8 +1286,12 @@ function initCalendar() {
                 "font-bold",
                 "selected",
             );
+            const timeInput = document.getElementById("booking-time");
+            if (timeInput) timeInput.value = btn.textContent.trim();
         });
     });
+
+    selectDate(today);
 }
 
 /* =========================================
@@ -1194,9 +1325,11 @@ function initWhatsAppBooking() {
             checkedService?.value ||
             "";
         const selectedDay =
+            form.querySelector('[name="booking_date"]')?.value?.trim() ||
             form
                 .querySelector("[data-cal-day].selected")
-                ?.textContent?.trim() || "";
+                ?.getAttribute("data-cal-day") ||
+            "";
         const selectedTime =
             form
                 .querySelector("[data-time-slot].selected, [data-time-btn].selected")
@@ -1214,11 +1347,47 @@ function initWhatsAppBooking() {
             return;
         }
 
-        const msg = `Halo IndoOptik! Saya ingin membuat janji:\n\nNama: ${name}\nTelepon: ${phone}\nLayanan: ${service}\nTanggal: ${selectedDay || "-"}\nWaktu: ${selectedTime || "-"}\n\nMohon konfirmasinya. Terima kasih!`;
-        window.open(
-            `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(msg)}`,
-            "_blank",
-        );
+        if (!selectedDay) {
+            showToast("error", "Tanggal Belum Dipilih", "Pilih tanggal booking.");
+            return;
+        }
+
+        const csrf = document.querySelector('meta[name="csrf-token"]')?.content;
+        const formUrl = form.getAttribute("action");
+
+        fetch(formUrl, {
+            method: "POST",
+            credentials: "same-origin",
+            headers: {
+                "Content-Type": "application/json",
+                Accept: "application/json",
+                "X-CSRF-TOKEN": csrf || "",
+            },
+            body: JSON.stringify({
+                service: checkedService?.value || "exam",
+                booking_date: selectedDay,
+                booking_time: selectedTime,
+                name,
+                phone,
+            }),
+        })
+            .then(async (response) => {
+                const data = await response.json().catch(() => ({}));
+                if (!response.ok) {
+                    const message =
+                        data?.errors?.booking_date?.[0] ||
+                        data?.message ||
+                        "Jadwal tidak valid.";
+                    throw new Error(message);
+                }
+                return data;
+            })
+            .then((data) => {
+                window.open(data.wa_url, "_blank");
+            })
+            .catch((error) => {
+                showToast("error", "Booking Gagal", error.message);
+            });
     });
 }
 

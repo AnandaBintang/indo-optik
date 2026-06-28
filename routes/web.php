@@ -27,6 +27,9 @@ Route::get("/produk/{slug}", [ProductController::class, "show"])->name(
 Route::get("/layanan", [ServiceController::class, "index"])->name(
     "services.index",
 );
+Route::post("/layanan/booking", [ServiceController::class, "storeBooking"])->name(
+    "services.booking.store",
+);
 Route::get("/blog", [BlogArticleController::class, "index"])->name(
     "blog.index",
 );

@@ -48,6 +48,39 @@ test("cart stores selected frame type and includes frame price in subtotal", fun
         ->and(app(\App\Services\CartService::class)->getSubtotal())->toBe(1700000);
 });
 
+test("cart add returns a success payload for json requests", function () {
+    $category = Category::create([
+        "name" => "Frame",
+        "slug" => "frame-json",
+        "status" => "active",
+    ]);
+
+    $product = Product::factory()->create([
+        "category_id" => $category->id,
+        "name" => "JSON Cart Product",
+        "price" => 500000,
+        "discount_price" => null,
+        "status" => "active",
+    ]);
+
+    $response = $this->postJson(route("cart.add"), [
+        "product_id" => $product->id,
+        "frame_type" => "Standar",
+        "frame_price" => 0,
+        "lens_type" => "Standar",
+        "lens_price" => 0,
+        "color" => "Hitam",
+        "quantity" => 1,
+        "delivery_type" => "pickup",
+    ]);
+
+    $response
+        ->assertOk()
+        ->assertJsonPath("success", true)
+        ->assertJsonPath("cart_count", 1)
+        ->assertJsonPath("message", "Produk berhasil ditambahkan ke keranjang!");
+});
+
 test("whatsapp message includes selected frame type and frame price", function () {
     $cart = app(\App\Services\CartService::class);
 

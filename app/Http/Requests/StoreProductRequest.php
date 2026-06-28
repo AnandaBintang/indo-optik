@@ -37,14 +37,14 @@ class StoreProductRequest extends FormRequest
                 "nullable",
                 "image",
                 "mimes:jpg,jpeg,png,webp",
-                "max:2048",
+                "max:5120",
             ],
             "image_url" => ["nullable", "url", "max:1000"],
             "additional_images" => ["nullable", "array", "max:10"],
             "additional_images.*" => [
                 "image",
                 "mimes:jpg,jpeg,png,webp",
-                "max:2048",
+                "max:5120",
             ],
             "meta_title" => ["nullable", "string", "max:255"],
             "meta_description" => ["nullable", "string", "max:500"],
@@ -57,7 +57,7 @@ class StoreProductRequest extends FormRequest
             "color_variants.*.image_uploads.*" => [
                 "image",
                 "mimes:jpg,jpeg,png,webp",
-                "max:2048",
+                "max:5120",
             ],
             "lens_variants" => ["nullable", "array"],
             "lens_variants.*.key" => ["nullable", "string", "max:50"],
@@ -142,14 +142,14 @@ class StoreProductRequest extends FormRequest
             "image.image" => "File gambar utama harus berupa gambar.",
             "image.mimes" =>
                 "Gambar utama harus berformat JPG, JPEG, PNG, atau WebP.",
-            "image.max" => "Ukuran gambar utama maksimal 2 MB.",
+            "image.max" => "Ukuran gambar utama maksimal 5 MB.",
             "additional_images.max" => "Maksimal 10 gambar tambahan.",
             "additional_images.*.image" =>
                 "Setiap gambar tambahan harus berupa file gambar.",
             "additional_images.*.mimes" =>
                 "Gambar tambahan harus berformat JPG, JPEG, PNG, atau WebP.",
             "additional_images.*.max" =>
-                "Ukuran setiap gambar tambahan maksimal 2 MB.",
+                "Ukuran setiap gambar tambahan maksimal 5 MB.",
         ];
     }
 

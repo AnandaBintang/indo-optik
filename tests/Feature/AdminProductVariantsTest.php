@@ -72,6 +72,34 @@ test("admin can store product variants with lens icon and mixed color images", f
         ->and($colorVariant["images"][2])->toStartWith("/storage/products/variants/");
 });
 
+test("admin can store product with supported five megabyte image upload", function () {
+    Storage::fake("public");
+
+    $admin = makeAdminUser();
+    $category = makeActiveCategory();
+
+    $image = UploadedFile::fake()->image("main.jpg")->size(5120);
+
+    $response = $this->actingAs($admin)->post(route("admin.products.store"), [
+        "name" => "Large Image Product",
+        "category_id" => $category->id,
+        "description" => "Desc",
+        "short_description" => "Short desc",
+        "price" => 450000,
+        "stock" => 7,
+        "sku" => "LG-IMG-100",
+        "status" => "active",
+        "image" => $image,
+    ]);
+
+    $response->assertRedirect(route("admin.products.index"));
+
+    $product = Product::query()->where("name", "Large Image Product")->firstOrFail();
+
+    expect($product->image)->not->toBeNull();
+    Storage::disk("public")->assertExists($product->image);
+});
+
 test("admin can update product variants and keep uploaded color image references", function () {
     Storage::fake("public");
 

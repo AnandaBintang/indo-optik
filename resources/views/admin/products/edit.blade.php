@@ -325,7 +325,7 @@
 
         <div class="space-y-5">
           <!-- Gambar Utama -->
-          <div x-data="{ mode: 'file', previewUrl: '{{ $product->image_url }}', url: '' }">
+          <div x-data="{ mode: 'file', previewUrl: '{{ $product->image_url }}', url: '', setFilePreview(file) { if (this.previewUrl && this.previewUrl.startsWith('blob:')) URL.revokeObjectURL(this.previewUrl); this.url = ''; this.previewUrl = URL.createObjectURL(file); } }">
             <label class="block text-sm font-bold text-neutral-900 mb-2">Gambar Utama</label>
 
             <div class="flex items-center space-x-2 mb-3">
@@ -340,8 +340,7 @@
                 <input id="image" name="image" type="file" accept="image/*" class="absolute inset-0 w-full h-full opacity-0 z-20 cursor-pointer"
                   @change="
                     if($event.target.files.length) {
-                      url = '';
-                      previewUrl = URL.createObjectURL($event.target.files[0]);
+                      setFilePreview($event.target.files[0]);
                     }
                   "
                 >

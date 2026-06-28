@@ -31,7 +31,8 @@
 
   <!-- Form Pemesanan -->
   <div class="bg-white rounded-[32px] p-6 md:p-10 shadow-xl shadow-indigo-100/50 border border-zinc-100" data-animate="slide-left">
-    <form action="#" method="POST" id="booking-form" class="space-y-8">
+    <form action="{{ route('services.booking.store') }}" method="POST" id="booking-form" class="space-y-8">
+      @csrf
 
       <!-- Layanan -->
       <div>
@@ -66,55 +67,26 @@
           <i class="fa-solid fa-2 text-indigo-500 bg-indigo-50 w-7 h-7 flex items-center justify-center rounded-full text-sm"></i>
           Pilih Jadwal
         </h2>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <input type="hidden" name="booking_date" id="booking-date" value="">
+        <input type="hidden" name="booking_time" id="booking-time" value="14:00">
+        <div class="grid grid-cols-1 xl:grid-cols-[minmax(0,1fr)_220px] gap-6 items-start">
 
           <!-- Kalender -->
-          <div class="border border-zinc-200 rounded-[20px] p-4 bg-white shadow-sm">
+          <div class="booking-calendar border border-zinc-200 rounded-[20px] p-4 bg-white shadow-sm">
             <div class="flex justify-between items-center mb-4">
-              <button type="button" class="text-gray-400 hover:text-indigo-600 transition"><i class="fa-solid fa-chevron-left"></i></button>
-              <span class="font-bold text-neutral-900">{{ now()->translatedFormat('F Y') }}</span>
-              <button type="button" class="text-gray-400 hover:text-indigo-600 transition"><i class="fa-solid fa-chevron-right"></i></button>
+              <button type="button" data-cal-prev class="calendar-nav text-gray-400 hover:text-indigo-600 transition" aria-label="Bulan sebelumnya"><i class="fa-solid fa-chevron-left"></i></button>
+              <span class="font-bold text-neutral-900" data-cal-title>{{ now()->translatedFormat('F Y') }}</span>
+              <button type="button" data-cal-next class="calendar-nav text-gray-400 hover:text-indigo-600 transition" aria-label="Bulan berikutnya"><i class="fa-solid fa-chevron-right"></i></button>
             </div>
             <div class="grid grid-cols-7 gap-1 text-center text-xs font-semibold text-gray-400 mb-2">
               <div>Min</div><div>Sen</div><div>Sel</div><div>Rab</div><div>Kam</div><div>Jum</div><div>Sab</div>
             </div>
-            <div class="grid grid-cols-7 gap-1 text-center">
-              <!-- Disabled -->
-              <div class="h-9 w-9 mx-auto flex items-center justify-center text-gray-300">1</div>
-              <div class="h-9 w-9 mx-auto flex items-center justify-center text-gray-300">2</div>
-              <div class="h-9 w-9 mx-auto flex items-center justify-center text-gray-300">3</div>
-              <div class="h-9 w-9 mx-auto flex items-center justify-center text-gray-300">4</div>
-
-              <!-- Active -->
-              <div data-cal-day class="h-9 w-9 mx-auto flex items-center justify-center rounded-full text-sm cursor-pointer transition-all duration-150 hover:bg-indigo-50 hover:text-indigo-600 text-neutral-700">5</div>
-              <div data-cal-day class="h-9 w-9 mx-auto flex items-center justify-center rounded-full text-sm cursor-pointer transition-all duration-150 hover:bg-indigo-50 hover:text-indigo-600 text-neutral-700">6</div>
-              <div data-cal-day class="h-9 w-9 mx-auto flex items-center justify-center rounded-full text-sm cursor-pointer transition-all duration-150 hover:bg-indigo-50 hover:text-indigo-600 text-neutral-700">7</div>
-              <div data-cal-day class="h-9 w-9 mx-auto flex items-center justify-center rounded-full text-sm cursor-pointer transition-all duration-150 hover:bg-indigo-50 hover:text-indigo-600 text-neutral-700">8</div>
-              <div data-cal-day class="h-9 w-9 mx-auto flex items-center justify-center rounded-full text-sm cursor-pointer transition-all duration-150 hover:bg-indigo-50 hover:text-indigo-600 text-neutral-700">9</div>
-              <div data-cal-day class="h-9 w-9 mx-auto flex items-center justify-center rounded-full text-sm cursor-pointer transition-all duration-150 hover:bg-indigo-50 hover:text-indigo-600 text-neutral-700">10</div>
-              <div data-cal-day class="h-9 w-9 mx-auto flex items-center justify-center rounded-full text-sm cursor-pointer transition-all duration-150 hover:bg-indigo-50 hover:text-indigo-600 text-neutral-700">11</div>
-              <div data-cal-day class="h-9 w-9 mx-auto flex items-center justify-center rounded-full text-sm cursor-pointer transition-all duration-150 hover:bg-indigo-50 hover:text-indigo-600 text-neutral-700">12</div>
-              <div data-cal-day class="h-9 w-9 mx-auto flex items-center justify-center rounded-full text-sm cursor-pointer transition-all duration-150 hover:bg-indigo-50 hover:text-indigo-600 text-neutral-700">13</div>
-              <div data-cal-day class="h-9 w-9 mx-auto flex items-center justify-center rounded-full text-sm cursor-pointer transition-all duration-150 hover:bg-indigo-50 hover:text-indigo-600 text-neutral-700">14</div>
-              <div data-cal-day class="h-9 w-9 mx-auto flex items-center justify-center rounded-full text-sm cursor-pointer transition-all duration-150 hover:bg-indigo-50 hover:text-indigo-600 text-neutral-700">15</div>
-              <div data-cal-day class="h-9 w-9 mx-auto flex items-center justify-center rounded-full text-sm cursor-pointer transition-all duration-150 hover:bg-indigo-50 hover:text-indigo-600 text-neutral-700">16</div>
-
-              <!-- Selected -->
-              <div data-cal-day class="selected h-9 w-9 mx-auto flex items-center justify-center rounded-full text-sm cursor-pointer transition-all duration-150 bg-indigo-500 text-white font-bold shadow-md shadow-indigo-200">17</div>
-
-              <div data-cal-day class="h-9 w-9 mx-auto flex items-center justify-center rounded-full text-sm cursor-pointer transition-all duration-150 hover:bg-indigo-50 hover:text-indigo-600 text-neutral-700">18</div>
-              <div data-cal-day class="h-9 w-9 mx-auto flex items-center justify-center rounded-full text-sm cursor-pointer transition-all duration-150 hover:bg-indigo-50 hover:text-indigo-600 text-neutral-700">19</div>
-              <div data-cal-day class="h-9 w-9 mx-auto flex items-center justify-center rounded-full text-sm cursor-pointer transition-all duration-150 hover:bg-indigo-50 hover:text-indigo-600 text-neutral-700">20</div>
-              <div data-cal-day class="h-9 w-9 mx-auto flex items-center justify-center rounded-full text-sm cursor-pointer transition-all duration-150 hover:bg-indigo-50 hover:text-indigo-600 text-neutral-700">21</div>
-              <div data-cal-day class="h-9 w-9 mx-auto flex items-center justify-center rounded-full text-sm cursor-pointer transition-all duration-150 hover:bg-indigo-50 hover:text-indigo-600 text-neutral-700">22</div>
-              <div data-cal-day class="h-9 w-9 mx-auto flex items-center justify-center rounded-full text-sm cursor-pointer transition-all duration-150 hover:bg-indigo-50 hover:text-indigo-600 text-neutral-700">23</div>
-              <div data-cal-day class="h-9 w-9 mx-auto flex items-center justify-center rounded-full text-sm cursor-pointer transition-all duration-150 hover:bg-indigo-50 hover:text-indigo-600 text-neutral-700">24</div>
-              <div data-cal-day class="h-9 w-9 mx-auto flex items-center justify-center rounded-full text-sm cursor-pointer transition-all duration-150 hover:bg-indigo-50 hover:text-indigo-600 text-neutral-700">25</div>
-            </div>
+            <div class="booking-calendar-grid grid grid-cols-7 gap-1 text-center" data-cal-grid></div>
+            <p class="mt-3 text-xs font-medium text-red-500 hidden" data-booking-error></p>
           </div>
 
           <!-- Pilihan Waktu -->
-          <div class="grid grid-cols-2 gap-2 text-center text-sm">
+          <div class="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-2 gap-2 text-center text-sm">
             <button type="button" data-time-btn class="py-3.5 rounded-2xl border-2 border-zinc-200 text-gray-500 font-medium hover:border-indigo-500 hover:text-indigo-600 transition-all duration-200">10:00</button>
             <button type="button" data-time-btn class="py-3.5 rounded-2xl border-2 border-zinc-200 text-gray-500 font-medium hover:border-indigo-500 hover:text-indigo-600 transition-all duration-200">11:00</button>
             <button type="button" data-time-btn class="py-3.5 rounded-2xl border-2 border-zinc-200 text-gray-500 font-medium hover:border-indigo-500 hover:text-indigo-600 transition-all duration-200">13:00</button>

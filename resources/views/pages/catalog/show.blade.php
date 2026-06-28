@@ -163,9 +163,9 @@
       </div>
 
       {{-- Deskripsi --}}
-      <p class="text-gray-500 leading-relaxed text-[0.95rem]">
-        {{ $product->description ?? 'Frame bundar klasik dengan material polymer berkualitas tinggi. Sangat ringan namun kokoh, dirancang beradaptasi dengan kontur wajah untuk kenyamanan sepanjang hari. Pilihan sempurna untuk tampilan cerdas dan stylish.' }}
-      </p>
+      <div class="product-description text-gray-500 leading-relaxed text-[0.95rem]">
+        {!! $product->safe_description_html ?: '<p>Frame bundar klasik dengan material polymer berkualitas tinggi. Sangat ringan namun kokoh, dirancang beradaptasi dengan kontur wajah untuk kenyamanan sepanjang hari. Pilihan sempurna untuk tampilan cerdas dan stylish.</p>' !!}
+      </div>
 
       {{-- Divider --}}
       <hr class="border-zinc-200">

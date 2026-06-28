@@ -307,7 +307,7 @@
 
         <div class="space-y-5">
           <!-- Gambar Utama -->
-          <div x-data="{ mode: 'file', previewUrl: '', url: '' }">
+          <div x-data="{ mode: 'file', previewUrl: '', url: '', setFilePreview(file) { if (this.previewUrl && this.previewUrl.startsWith('blob:')) URL.revokeObjectURL(this.previewUrl); this.url = ''; this.previewUrl = URL.createObjectURL(file); } }">
             <label class="block text-sm font-bold text-neutral-900 mb-2">Gambar Utama <span class="text-red-500">*</span></label>
 
             <div class="flex items-center space-x-2 mb-3">
@@ -323,8 +323,7 @@
                 <input id="image" name="image" type="file" accept="image/*" class="absolute inset-0 w-full h-full opacity-0 z-20 cursor-pointer"
                   @change="
                     if($event.target.files.length) {
-                      url = '';
-                      previewUrl = URL.createObjectURL($event.target.files[0]);
+                      setFilePreview($event.target.files[0]);
                     }
                   "
                 >
@@ -335,7 +334,7 @@
                   <div class="flex text-sm justify-center">
                     <span class="font-bold text-indigo-600">Klik atau drag untuk upload</span>
                   </div>
-                  <p class="text-xs text-gray-500">PNG, JPG, WEBP maks 2MB</p>
+                  <p class="text-xs text-gray-500">PNG, JPG, WEBP maks 5MB</p>
                 </div>
 
                 <!-- Preview Image -->
