@@ -190,7 +190,7 @@
           </div>
           <div>
             <p class="font-bold text-neutral-900 leading-tight">Telepon</p>
-            <p class="text-gray-500 text-sm mt-1"><a href="tel:{{ $settings['whatsapp_number'] ?? '+6281234567890' }}" class="hover:text-indigo-600 hover:underline">{{ $settings['whatsapp_number'] ?? '+62 812-3456-7890' }}</a></p>
+            <p class="text-gray-500 text-sm mt-1"><a href="tel:+{{ $waNumber ?? $settings['whatsapp_number'] ?? '6281234567890' }}" class="hover:text-indigo-600 hover:underline">+{{ $waNumber ?? $settings['whatsapp_number'] ?? '6281234567890' }}</a></p>
           </div>
         </li>
       </ul>

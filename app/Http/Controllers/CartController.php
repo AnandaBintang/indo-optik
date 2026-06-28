@@ -158,7 +158,7 @@ class CartController extends Controller
             }
         }
 
-        $waNumber = $this->settingService->get('whatsapp_number', '6281234567890');
+        $waNumber = $this->settingService->getWhatsAppNumber();
 
         $waUrl = $this->cartService->buildWhatsAppMessage(
             customerName: $validated['customer_name'],

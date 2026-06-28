@@ -24,7 +24,7 @@
   @php
     $cartItems   = session('cart', []);
     $hasItems    = count($cartItems) > 0;
-    $waNumber    = $settings['whatsapp_number'] ?? '6281234567890';
+    $waNumber    = $waNumber ?? $settings['whatsapp_number'] ?? '6281234567890';
 
     // Build subtotal
     $subtotal = 0;

@@ -1,7 +1,7 @@
 {{-- resources/views/partials/navbar.blade.php --}}
 <header id="main-navbar"
         class="sticky top-0 z-50"
-        data-wa-number="{{ $settings['whatsapp_number'] ?? '6281234567890' }}">
+        data-wa-number="{{ $waNumber ?? $settings['whatsapp_number'] ?? '6281234567890' }}">
 
   <div class="navbar-inner">
 

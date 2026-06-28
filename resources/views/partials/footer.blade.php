@@ -61,7 +61,7 @@
         </li>
         <li>
           <span class="fi-icon wa"><i class="fa-brands fa-whatsapp"></i></span>
-          <a href="https://wa.me/{{ $settings['whatsapp_number'] ?? '6281234567890' }}"
+          <a href="https://wa.me/{{ $waNumber ?? $settings['whatsapp_number'] ?? '6281234567890' }}"
              target="_blank"
              rel="noopener noreferrer"
              style="color:inherit;">

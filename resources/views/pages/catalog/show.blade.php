@@ -472,7 +472,7 @@
           class="btn btn-whatsapp btn-xl flex-1 justify-center"
           id="wa-order-btn"
           data-product-name="{{ $product->name ?? 'Classic Round Frame' }}"
-          data-wa-number="{{ $settings['whatsapp_number'] ?? '6281234567890' }}">
+          data-wa-number="{{ $waNumber ?? $settings['whatsapp_number'] ?? '6281234567890' }}">
           <i class="fa-brands fa-whatsapp text-lg"></i>
           Beli via WhatsApp
         </button>
@@ -480,7 +480,7 @@
         <button
           class="btn btn-outline btn-xl flex-1 justify-center"
           id="add-to-cart-btn"
-          data-cart-url="{{ route('cart.add') }}"
+          data-cart-url="{{ route('cart.add', [], false) }}"
           data-product-id="{{ $product->id ?? '' }}"
           data-product-name="{{ $product->name ?? 'Classic Round Frame' }}"
           data-product-slug="{{ $product->slug ?? 'classic-round-frame' }}"

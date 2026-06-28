@@ -5,6 +5,54 @@ import "@fortawesome/fontawesome-free/css/all.min.css";
 
 window.Alpine = Alpine;
 
+Alpine.data("productImagePicker", (initialPreview = "") => ({
+    mode: "file",
+    previewUrl: initialPreview || "",
+    url: "",
+
+    get fileUploadClasses() {
+        return this.previewUrl && !this.url
+            ? "border border-zinc-200 bg-gray-50 p-2"
+            : "border-2 border-zinc-300 border-dashed px-6 pt-5 pb-6 flex justify-center bg-neutral-50";
+    },
+
+    get hasFilePreview() {
+        return Boolean(this.previewUrl && !this.url);
+    },
+
+    get showFilePlaceholder() {
+        return !this.previewUrl || Boolean(this.url);
+    },
+
+    selectFileMode() {
+        this.mode = "file";
+    },
+
+    selectUrlMode() {
+        this.mode = "url";
+        this.previewUrl = this.url;
+    },
+
+    setUrlPreview() {
+        this.previewUrl = this.url;
+    },
+
+    clearPreview() {
+        this.previewUrl = "";
+    },
+
+    setFilePreview(file) {
+        if (!file) return;
+
+        if (this.previewUrl && this.previewUrl.startsWith("blob:")) {
+            URL.revokeObjectURL(this.previewUrl);
+        }
+
+        this.url = "";
+        this.previewUrl = URL.createObjectURL(file);
+    },
+}));
+
 Alpine.start();
 
 /* =========================================

@@ -6,9 +6,14 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\View\View;
+use App\Services\SettingService;
 
 class ServiceController extends Controller
 {
+    public function __construct(
+        protected SettingService $settingService,
+    ) {}
+
     /**
      * Display the services page.
      */
@@ -43,7 +48,7 @@ class ServiceController extends Controller
             'consultation' => 'Konsultasi Frame',
         ];
 
-        $waNumber = data_get(view()->shared('settings', []), 'whatsapp_number', '6281234567890');
+        $waNumber = $this->settingService->getWhatsAppNumber();
         $message = implode("\n", [
             'Halo IndoOptik! Saya ingin membuat janji:',
             '',

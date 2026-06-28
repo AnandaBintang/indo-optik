@@ -325,12 +325,12 @@
 
         <div class="space-y-5">
           <!-- Gambar Utama -->
-          <div x-data="{ mode: 'file', previewUrl: '{{ $product->image_url }}', url: '', setFilePreview(file) { if (this.previewUrl && this.previewUrl.startsWith('blob:')) URL.revokeObjectURL(this.previewUrl); this.url = ''; this.previewUrl = URL.createObjectURL(file); } }">
+          <div x-data='productImagePicker(@js($product->image_url))'>
             <label class="block text-sm font-bold text-neutral-900 mb-2">Gambar Utama</label>
 
             <div class="flex items-center space-x-2 mb-3">
-               <button type="button" @click="mode = 'file'" :class="mode === 'file' ? 'bg-indigo-600 text-white' : 'bg-gray-100 text-gray-600'" class="px-3 py-1.5 text-[11px] font-bold uppercase tracking-wider rounded-lg transition">Upload File</button>
-               <button type="button" @click="mode = 'url'; previewUrl = url" :class="mode === 'url' ? 'bg-indigo-600 text-white' : 'bg-gray-100 text-gray-600'" class="px-3 py-1.5 text-[11px] font-bold uppercase tracking-wider rounded-lg transition">Gunakan URL</button>
+               <button type="button" @click="selectFileMode" :class="mode === 'file' ? 'bg-indigo-600 text-white' : 'bg-gray-100 text-gray-600'" class="px-3 py-1.5 text-[11px] font-bold uppercase tracking-wider rounded-lg transition">Upload File</button>
+               <button type="button" @click="selectUrlMode" :class="mode === 'url' ? 'bg-indigo-600 text-white' : 'bg-gray-100 text-gray-600'" class="px-3 py-1.5 text-[11px] font-bold uppercase tracking-wider rounded-lg transition">Gunakan URL</button>
             </div>
 
             <!-- File Upload Mode -->
@@ -346,7 +346,7 @@
                 >
 
                 <!-- Placeholder if no image -->
-                <div x-show="!previewUrl && !url" class="space-y-1 text-center relative z-10 pointer-events-none p-4">
+                <div x-show="!hasFilePreview" class="space-y-1 text-center relative z-10 pointer-events-none p-4">
                   <i class="fa-solid fa-cloud-arrow-up text-3xl text-gray-400 mb-2 group-hover:scale-110 transition-transform text-indigo-400"></i>
                   <div class="flex text-sm justify-center">
                      <span class="font-bold text-indigo-600">Pilih gambar baru</span>
@@ -354,7 +354,7 @@
                 </div>
 
                 <!-- Preview Image -->
-                <div x-show="previewUrl && !url" class="relative w-full h-48 rounded-lg overflow-hidden flex items-center justify-center">
+                <div x-show="hasFilePreview" class="relative w-full h-48 rounded-lg overflow-hidden flex items-center justify-center">
                   <img :src="previewUrl" class="object-contain w-full h-full absolute inset-0 z-0">
                   <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity z-10 flex items-center justify-center">
                        <span class="text-white font-bold text-sm bg-black/70 px-4 py-2 rounded-full backdrop-blur-sm"><i class="fa-solid fa-pen mr-2"></i>Ganti Gambar</span>
@@ -366,11 +366,11 @@
             <!-- URL Mode -->
             <template x-if="mode === 'url'">
               <div class="mt-1">
-                <input type="url" id="image_url" name="image_url" x-model="url" @input="previewUrl = url" placeholder="https://unsplash.com/photo-..."
+                <input type="url" id="image_url" name="image_url" x-model="url" @input="setUrlPreview" placeholder="https://unsplash.com/photo-..."
                   class="w-full bg-neutral-50 rounded-xl py-3 px-4 text-sm font-medium border border-zinc-200 focus:ring-2 focus:ring-indigo-500 focus:outline-none mb-3">
 
                 <div x-show="previewUrl" class="relative w-full h-48 rounded-lg overflow-hidden flex items-center justify-center bg-gray-50 border border-zinc-200 p-2">
-                  <img :src="previewUrl" class="object-contain w-full h-full rounded-md" @@error="previewUrl = ''">
+                  <img :src="previewUrl" class="object-contain w-full h-full rounded-md" @@error="clearPreview">
                 </div>
               </div>
             </template>

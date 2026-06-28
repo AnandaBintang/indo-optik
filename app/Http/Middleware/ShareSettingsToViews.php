@@ -24,12 +24,13 @@ class ShareSettingsToViews
     {
         try {
             $settings = $this->settingService->getAll();
-            $waNumber = $this->settingService->get('whatsapp_number', '6281234567890');
+            $waNumber = $this->settingService->getWhatsAppNumber();
+            $settings['whatsapp_number'] = $waNumber;
         } catch (\Throwable $e) {
             // If the settings table does not yet exist (e.g. during migrations),
             // fall back to safe defaults so the app doesn't crash.
             $settings = [];
-            $waNumber = '6281234567890';
+            $waNumber = SettingService::DEFAULT_WHATSAPP_NUMBER;
         }
 
         View::share('settings', $settings);

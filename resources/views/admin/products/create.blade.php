@@ -307,18 +307,18 @@
 
         <div class="space-y-5">
           <!-- Gambar Utama -->
-          <div x-data="{ mode: 'file', previewUrl: '', url: '', setFilePreview(file) { if (this.previewUrl && this.previewUrl.startsWith('blob:')) URL.revokeObjectURL(this.previewUrl); this.url = ''; this.previewUrl = URL.createObjectURL(file); } }">
+          <div x-data="productImagePicker()">
             <label class="block text-sm font-bold text-neutral-900 mb-2">Gambar Utama <span class="text-red-500">*</span></label>
 
             <div class="flex items-center space-x-2 mb-3">
-               <button type="button" @click="mode = 'file'" :class="mode === 'file' ? 'bg-indigo-600 text-white' : 'bg-gray-100 text-gray-600'" class="px-3 py-1.5 text-[11px] font-bold uppercase tracking-wider rounded-lg transition">Upload File</button>
-               <button type="button" @click="mode = 'url'" :class="mode === 'url' ? 'bg-indigo-600 text-white' : 'bg-gray-100 text-gray-600'" class="px-3 py-1.5 text-[11px] font-bold uppercase tracking-wider rounded-lg transition">Gunakan URL</button>
+               <button type="button" @click="selectFileMode" :class="mode === 'file' ? 'bg-indigo-600 text-white' : 'bg-gray-100 text-gray-600'" class="px-3 py-1.5 text-[11px] font-bold uppercase tracking-wider rounded-lg transition">Upload File</button>
+               <button type="button" @click="selectUrlMode" :class="mode === 'url' ? 'bg-indigo-600 text-white' : 'bg-gray-100 text-gray-600'" class="px-3 py-1.5 text-[11px] font-bold uppercase tracking-wider rounded-lg transition">Gunakan URL</button>
             </div>
 
             <!-- File Upload Mode -->
             <template x-if="mode === 'file'">
               <div class="mt-1 relative rounded-xl hover:border-indigo-400 hover:bg-indigo-50/50 transition-all cursor-pointer group"
-                   :class="previewUrl && !url ? 'border border-zinc-200 bg-gray-50 p-2' : 'border-2 border-zinc-300 border-dashed px-6 pt-5 pb-6 flex justify-center bg-neutral-50'">
+                   :class="fileUploadClasses">
 
                 <input id="image" name="image" type="file" accept="image/*" class="absolute inset-0 w-full h-full opacity-0 z-20 cursor-pointer"
                   @change="
@@ -329,7 +329,7 @@
                 >
 
                 <!-- Placeholder -->
-                <div x-show="!previewUrl || url" class="space-y-1 text-center relative z-10 pointer-events-none">
+                <div x-show="showFilePlaceholder" class="space-y-1 text-center relative z-10 pointer-events-none">
                   <i class="fa-solid fa-cloud-arrow-up text-3xl text-gray-400 mb-2 group-hover:scale-110 transition-transform text-indigo-400"></i>
                   <div class="flex text-sm justify-center">
                     <span class="font-bold text-indigo-600">Klik atau drag untuk upload</span>
@@ -338,8 +338,8 @@
                 </div>
 
                 <!-- Preview Image -->
-                <div x-show="previewUrl && !url" class="relative w-full h-48 rounded-lg overflow-hidden flex items-center justify-center">
-                  <img :src="!url ? previewUrl : ''" class="object-contain w-full h-full absolute inset-0 z-0">
+                <div x-show="hasFilePreview" class="relative w-full h-48 rounded-lg overflow-hidden flex items-center justify-center">
+                  <img :src="previewUrl" class="object-contain w-full h-full absolute inset-0 z-0">
                   <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity z-10 flex items-center justify-center">
                        <span class="text-white font-bold text-sm bg-black/70 px-4 py-2 rounded-full backdrop-blur-sm"><i class="fa-solid fa-pen mr-2"></i>Ganti Gambar</span>
                   </div>
@@ -350,12 +350,12 @@
             <!-- URL Mode -->
             <template x-if="mode === 'url'">
               <div class="mt-1">
-                <input type="url" id="image_url" name="image_url" x-model="url" @input="previewUrl = url" placeholder="https://unsplash.com/photo-..."
+                <input type="url" id="image_url" name="image_url" x-model="url" @input="setUrlPreview" placeholder="https://unsplash.com/photo-..."
                   class="w-full bg-neutral-50 rounded-xl py-3 px-4 text-sm font-medium border border-zinc-200 focus:ring-2 focus:ring-indigo-500 focus:outline-none mb-3">
 
                 <!-- Preview Image -->
                 <div x-show="previewUrl" class="relative w-full h-48 rounded-lg overflow-hidden flex items-center justify-center bg-gray-50 border border-zinc-200 p-2">
-                  <img :src="previewUrl" class="object-contain w-full h-full rounded-md" @@error="previewUrl = ''">
+                  <img :src="previewUrl" class="object-contain w-full h-full rounded-md" @@error="clearPreview">
                 </div>
               </div>
             </template>

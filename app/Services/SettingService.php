@@ -10,6 +10,7 @@ class SettingService
     const CACHE_KEY_ALL   = 'settings_all';
     const CACHE_KEY_GROUP = 'settings_group_';
     const CACHE_KEY_SINGLE = 'setting_';
+    const DEFAULT_WHATSAPP_NUMBER = '6281234567890';
 
     /**
      * Get a single setting value by key.
@@ -25,6 +26,28 @@ class SettingService
 
             return $setting ? $setting->value : $default;
         });
+    }
+
+    public function getWhatsAppNumber(): string
+    {
+        return $this->normalizeWhatsAppNumber(
+            (string) $this->get('whatsapp_number', self::DEFAULT_WHATSAPP_NUMBER)
+        );
+    }
+
+    public function normalizeWhatsAppNumber(string $number): string
+    {
+        $digits = preg_replace('/\D+/', '', $number) ?? '';
+
+        if ($digits === '') {
+            return self::DEFAULT_WHATSAPP_NUMBER;
+        }
+
+        if (str_starts_with($digits, '0')) {
+            return '62' . substr($digits, 1);
+        }
+
+        return $digits;
     }
 
     /**
