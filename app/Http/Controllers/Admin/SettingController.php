@@ -77,6 +77,10 @@ class SettingController extends Controller
                 continue;
             }
 
+            if (str_ends_with($key, '_url') && trim((string) $value) === '#') {
+                $value = '';
+            }
+
             // Determine the group: prefer the submitted group, then the
             // existing group from the DB, then fall back to 'general'.
             $group = $groupsInput[$key]

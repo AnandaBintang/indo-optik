@@ -25,9 +25,9 @@ class SettingSeeder extends Seeder
             ['key' => 'phone',           'value' => '+62 812-3456-7890',                      'group' => 'contact'],
 
             // Social
-            ['key' => 'facebook_url',   'value' => '#',                                       'group' => 'social'],
-            ['key' => 'instagram_url',  'value' => '#',                                       'group' => 'social'],
-            ['key' => 'tiktok_url',     'value' => '#',                                       'group' => 'social'],
+            ['key' => 'facebook_url',   'value' => '',                                        'group' => 'social'],
+            ['key' => 'instagram_url',  'value' => '',                                        'group' => 'social'],
+            ['key' => 'tiktok_url',     'value' => '',                                        'group' => 'social'],
 
             // SEO
             ['key' => 'meta_title',       'value' => 'IndoOptik — Kacamata & Lensa Berkualitas Terbaik',          'group' => 'seo'],

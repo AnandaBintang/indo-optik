@@ -89,6 +89,11 @@
                        if ($isEmail) $inputType = 'email';
                        if ($isPhone) $inputType = 'tel';
                        if ($isUrl) $inputType = 'url';
+
+                       $fieldValue = old('settings.'.$key, $value);
+                       if ($isUrl && trim((string) $fieldValue) === '#') {
+                           $fieldValue = '';
+                       }
                     @endphp
 
                     <div>
@@ -100,13 +105,14 @@
                           name="settings[{{ $key }}]" 
                           rows="4" 
                           class="w-full bg-neutral-50 rounded-xl py-3 px-4 text-sm font-medium focus:ring-2 focus:ring-indigo-500 border border-zinc-200"
-                        >{{ old('settings.'.$key, $value) }}</textarea>
+                        >{{ $fieldValue }}</textarea>
                       @else
                         <input 
                           type="{{ $inputType }}" 
                           id="setting_{{ $key }}" 
                           name="settings[{{ $key }}]" 
-                          value="{{ old('settings.'.$key, $value) }}"
+                          value="{{ $fieldValue }}"
+                          @if($isUrl) placeholder="https://example.com" @endif
                           class="w-full bg-neutral-50 rounded-xl py-3 px-4 text-sm font-medium focus:ring-2 focus:ring-indigo-500 border border-zinc-200"
                         >
                       @endif
