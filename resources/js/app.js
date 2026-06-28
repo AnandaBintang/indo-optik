@@ -41,6 +41,10 @@ Alpine.data("productImagePicker", (initialPreview = "") => ({
         this.previewUrl = "";
     },
 
+    handleFileChange(event) {
+        this.setFilePreview(event?.target?.files?.[0]);
+    },
+
     setFilePreview(file) {
         if (!file) return;
 

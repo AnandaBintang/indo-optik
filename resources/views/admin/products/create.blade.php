@@ -320,13 +320,7 @@
               <div class="mt-1 relative rounded-xl hover:border-indigo-400 hover:bg-indigo-50/50 transition-all cursor-pointer group"
                    :class="fileUploadClasses">
 
-                <input id="image" name="image" type="file" accept="image/*" class="absolute inset-0 w-full h-full opacity-0 z-20 cursor-pointer"
-                  @change="
-                    if($event.target.files.length) {
-                      setFilePreview($event.target.files[0]);
-                    }
-                  "
-                >
+                <input id="image" name="image" type="file" accept="image/*" class="absolute inset-0 w-full h-full opacity-0 z-20 cursor-pointer" @change="handleFileChange">
 
                 <!-- Placeholder -->
                 <div x-show="showFilePlaceholder" class="space-y-1 text-center relative z-10 pointer-events-none">
