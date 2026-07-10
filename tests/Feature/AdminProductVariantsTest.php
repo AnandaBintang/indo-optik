@@ -101,6 +101,61 @@ test("admin can store product with supported five megabyte image upload", functi
     Storage::disk("public")->assertExists($product->image);
 });
 
+test("admin can store product with wysiwyg html description", function () {
+    $admin = makeAdminUser();
+    $category = makeActiveCategory();
+
+    $response = $this->actingAs($admin)->post(route("admin.products.store"), [
+        "name" => "Wysiwyg Store Product",
+        "category_id" => $category->id,
+        "description" => "<h1>Keunggulan</h1><ul><li>Ringan</li><li><strong>Anti radiasi</strong></li></ul><script>alert('xss')</script>",
+        "short_description" => "Short desc",
+        "price" => 450000,
+        "stock" => 7,
+        "sku" => "WY-ST-100",
+        "status" => "active",
+    ]);
+
+    $response->assertRedirect(route("admin.products.index"));
+
+    $product = Product::query()->where("name", "Wysiwyg Store Product")->firstOrFail();
+
+    expect($product->description)
+        ->toBe("<h1>Keunggulan</h1><ul><li>Ringan</li><li><strong>Anti radiasi</strong></li></ul>")
+        ->and($product->description)->not->toContain("<script>");
+});
+
+test("admin can update product with wysiwyg html description", function () {
+    $admin = makeAdminUser();
+    $category = makeActiveCategory();
+    $product = Product::factory()->create([
+        "category_id" => $category->id,
+        "name" => "Wysiwyg Update Product",
+        "slug" => "wysiwyg-update-product",
+        "sku" => "WY-UP-100",
+        "description" => "Old desc",
+    ]);
+
+    $response = $this->actingAs($admin)->put(route("admin.products.update", $product->id), [
+        "name" => "Wysiwyg Update Product",
+        "category_id" => $category->id,
+        "description" => "<div>Spesifikasi</div><ol><li>Ukur wajah</li><li>Pilih lensa</li></ol><p><a href=\"https://indooptik.web.id\" onclick=\"alert(1)\">Lihat detail</a></p>",
+        "short_description" => "Short desc",
+        "price" => 500000,
+        "stock" => 12,
+        "sku" => "WY-UP-100",
+        "status" => "active",
+    ]);
+
+    $response->assertRedirect(route("admin.products.index"));
+
+    $product->refresh();
+
+    expect($product->description)
+        ->toBe("<div>Spesifikasi</div><ol><li>Ukur wajah</li><li>Pilih lensa</li></ol><p><a href=\"https://indooptik.web.id\" rel=\"noopener noreferrer\">Lihat detail</a></p>")
+        ->and($product->description)->not->toContain("onclick");
+});
+
 test("admin can update product variants and keep uploaded color image references", function () {
     Storage::fake("public");
 

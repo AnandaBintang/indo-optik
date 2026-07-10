@@ -83,6 +83,7 @@ class ProductController extends Controller
 
         // Generate a unique slug from the product name
         $validated['slug'] = $this->uniqueSlug($validated['name']);
+        $validated['description'] = Product::sanitizeDescriptionHtml($validated['description'] ?? null);
 
         // Handle primary image upload
         if ($request->filled('image_url')) {
@@ -164,6 +165,7 @@ class ProductController extends Controller
         } else {
             unset($validated['slug']);
         }
+        $validated['description'] = Product::sanitizeDescriptionHtml($validated['description'] ?? null);
 
         // Handle primary image upload
         if ($request->filled('image_url')) {

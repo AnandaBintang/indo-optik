@@ -125,10 +125,17 @@ class Product extends Model
 
     public function getSafeDescriptionHtmlAttribute(): string
     {
-        $html = (string) ($this->description ?? '');
+        $html = self::sanitizeDescriptionHtml($this->description);
+
+        return $html !== '' ? $html : e($this->short_description ?? '');
+    }
+
+    public static function sanitizeDescriptionHtml(?string $description): string
+    {
+        $html = (string) ($description ?? '');
         $html = preg_replace('/<(script|style)\b[^>]*>.*?<\/\1>/is', '', $html) ?? '';
-        $html = strip_tags($html, '<p><br><strong><b><em><i><ul><ol><li><a>');
-        $html = preg_replace('/<(p|br|strong|b|em|i|ul|ol|li)\b[^>]*>/i', '<$1>', $html) ?? '';
+        $html = strip_tags($html, '<div><p><br><strong><b><em><i><del><strike><h1><h2><h3><ul><ol><li><a>');
+        $html = preg_replace('/<(div|p|br|strong|b|em|i|del|strike|h1|h2|h3|ul|ol|li)\b[^>]*>/i', '<$1>', $html) ?? '';
         $html = preg_replace_callback('/<a\b([^>]*)>/i', function (array $matches): string {
             preg_match('/\s+href\s*=\s*([\'"])(.*?)\1/i', $matches[1], $hrefMatch);
             $href = $hrefMatch[2] ?? '';
@@ -140,7 +147,7 @@ class Product extends Model
             return '<a href="' . e($href) . '" rel="noopener noreferrer">';
         }, $html) ?? '';
 
-        return trim($html) !== '' ? $html : e($this->short_description ?? '');
+        return trim($html);
     }
 
 }

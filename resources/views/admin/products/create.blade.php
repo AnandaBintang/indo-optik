@@ -53,8 +53,38 @@
 
           <div>
             <label for="description" class="block text-sm font-bold text-neutral-900 mb-2">Deskripsi Produk</label>
-            <textarea id="description" name="description" rows="5"
-              class="w-full bg-neutral-50 rounded-xl py-3 px-4 text-sm font-medium focus:ring-2 focus:ring-indigo-500 border border-zinc-200" placeholder="Jelaskan spesifikasi, material, dan keunggulan...">{{ old('description') }}</textarea>
+            <input id="description" type="hidden" name="description" value="{{ old('description') }}">
+            <trix-toolbar id="description-toolbar" class="product-description-toolbar">
+              <div class="trix-button-row">
+                <span class="trix-button-group" data-trix-button-group="text-tools">
+                  <button type="button" class="trix-button trix-button--icon trix-button--icon-bold" data-trix-attribute="bold" title="Bold" tabindex="-1">Bold</button>
+                  <button type="button" class="trix-button trix-button--icon trix-button--icon-italic" data-trix-attribute="italic" title="Italic" tabindex="-1">Italic</button>
+                  <button type="button" class="trix-button trix-button--icon trix-button--icon-strike" data-trix-attribute="strike" title="Strike" tabindex="-1">Strike</button>
+                  <button type="button" class="trix-button trix-button--icon trix-button--icon-link" data-trix-attribute="href" data-trix-action="link" title="Link" tabindex="-1">Link</button>
+                </span>
+                <span class="trix-button-group" data-trix-button-group="block-tools">
+                  <button type="button" class="trix-button trix-button--icon trix-button--icon-heading-1" data-trix-attribute="heading1" title="Heading" tabindex="-1">Heading</button>
+                  <button type="button" class="trix-button trix-button--icon trix-button--icon-bullet-list" data-trix-attribute="bullet" title="Bullet list" tabindex="-1">Bullet list</button>
+                  <button type="button" class="trix-button trix-button--icon trix-button--icon-number-list" data-trix-attribute="number" title="Number list" tabindex="-1">Number list</button>
+                </span>
+                <span class="trix-button-group" data-trix-button-group="history-tools">
+                  <button type="button" class="trix-button trix-button--icon trix-button--icon-undo" data-trix-action="undo" title="Undo" tabindex="-1">Undo</button>
+                  <button type="button" class="trix-button trix-button--icon trix-button--icon-redo" data-trix-action="redo" title="Redo" tabindex="-1">Redo</button>
+                </span>
+              </div>
+              <div class="trix-dialogs" data-trix-dialogs>
+                <div class="trix-dialog trix-dialog--link" data-trix-dialog="href" data-trix-dialog-attribute="href">
+                  <div class="trix-dialog__link-fields">
+                    <input type="url" name="href" class="trix-input trix-input--dialog" placeholder="https://example.com" aria-label="URL" data-trix-input>
+                    <div class="trix-button-group">
+                      <input type="button" class="trix-button trix-button--dialog" value="Terapkan" data-trix-method="setAttribute">
+                      <input type="button" class="trix-button trix-button--dialog" value="Hapus" data-trix-method="removeAttribute">
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </trix-toolbar>
+            <trix-editor input="description" toolbar="description-toolbar" class="product-description-editor" placeholder="Jelaskan spesifikasi, material, dan keunggulan..."></trix-editor>
             @error('description') <p class="text-red-500 text-xs mt-1.5">{{ $message }}</p> @enderror
           </div>
         </div>

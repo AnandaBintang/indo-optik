@@ -2,6 +2,8 @@ import "./bootstrap";
 
 import Alpine from "@alpinejs/csp";
 import "@fortawesome/fontawesome-free/css/all.min.css";
+import "trix";
+import "trix/dist/trix.css";
 
 window.Alpine = Alpine;
 
@@ -58,6 +60,10 @@ Alpine.data("productImagePicker", (initialPreview = "") => ({
 }));
 
 Alpine.start();
+
+document.addEventListener("trix-file-accept", (event) => {
+    event.preventDefault();
+});
 
 /* =========================================
    IndoOptik — Scroll Animations
