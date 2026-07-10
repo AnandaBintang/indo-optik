@@ -5,12 +5,12 @@ RUN composer install --no-dev --no-interaction --no-progress --prefer-dist --opt
 
 FROM node:22-alpine AS frontend_assets
 WORKDIR /app
-COPY package.json package-lock.json ./
-RUN npm ci
+COPY package.json pnpm-lock.yaml ./
+RUN corepack enable && pnpm install --frozen-lockfile
 COPY resources ./resources
 COPY public ./public
 COPY vite.config.js ./
-RUN npm run build
+RUN pnpm run build
 
 FROM php:8.3-fpm-alpine
 

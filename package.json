@@ -1,10 +1,11 @@
 {
     "$schema": "https://www.schemastore.org/package.json",
     "private": true,
+    "packageManager": "pnpm@10.33.0",
     "type": "module",
     "scripts": {
         "build": "vite build",
-        "dev": "concurrently \"npm run dev:vite\" \"npm run dev:php\"",
+        "dev": "concurrently \"pnpm run dev:vite\" \"pnpm run dev:php\"",
         "dev:vite": "vite --force",
         "dev:php": "php artisan serve"
     },
